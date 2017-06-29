@@ -1,4 +1,6 @@
 #pragma once
+#include "ATLComTime.h"
+#include "afxcmn.h"
 
 
 // CDateDLG ¶Ô»°¿ò
@@ -21,4 +23,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton1();
+	COleDateTime m_time;
+	CString m_title;
+	CString m_content;
+	CListCtrl m_jr_Grid;
 };
