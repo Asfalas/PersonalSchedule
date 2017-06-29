@@ -8,7 +8,7 @@ void AdoAccess::OnInitADOConn()
 	try {
 		m_pConnection.CreateInstance("ADODB.Connection");
 		_bstr_t strConnect = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=PSchedule.mdb";
-		m_pConnection->Open(strConnect, "", "", adModeUnknown);
+		m_pConnection->Open(strConnect, _T(""), _T(""), adModeUnknown);
 		AfxMessageBox(_T("连接成功"));
 	}
 	catch (_com_error &e) {
@@ -35,12 +35,16 @@ _RecordsetPtr& AdoAccess::GetRecordSet(_bstr_t bstrSQL)
 		if (m_pConnection == NULL)
 			OnInitADOConn();
 		m_pRecordset.CreateInstance(__uuidof(Recordset));
-		m_pRecordset->Open(bstrSQL, m_pConnection.GetInterfacePtr(),
-			adOpenDynamic, adLockOptimistic, adCmdText);
+		m_pRecordset->Open(_variant_t(bstrSQL), m_pConnection.GetInterfacePtr(), adOpenDynamic, adLockBatchOptimistic, adCmdText);
+
 	}
-	catch (_com_error e)
+	catch (_com_error &e)
 	{
-		AfxMessageBox(e.Description());
+		AfxMessageBox(_T("链接失败"));
+		CString str;
+		str.Format(_T("%s    %s"), (LPCTSTR)e.Description(), \
+			(LPCTSTR)e.ErrorMessage());
+		AfxMessageBox(str);
 	}
 	return m_pRecordset;
 }

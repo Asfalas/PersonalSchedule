@@ -66,6 +66,9 @@
     <None Include="res\PersonalSchedule.rc2">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="PSchedule.mdb">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\PersonalSchedule.ico">

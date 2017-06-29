@@ -210,6 +210,7 @@
     <ResourceCompile Include="PersonalSchedule.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="PSchedule.mdb" />
     <None Include="res\PersonalSchedule.rc2" />
   </ItemGroup>
   <ItemGroup>
