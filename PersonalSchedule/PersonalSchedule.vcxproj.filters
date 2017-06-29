@@ -36,6 +36,9 @@
     <ClInclude Include="DateDLG.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="AdoAccess.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PersonalSchedule.cpp">
@@ -48,6 +51,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DateDLG.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AdoAccess.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

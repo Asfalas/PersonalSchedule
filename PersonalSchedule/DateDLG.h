@@ -10,7 +10,7 @@ class CDateDLG : public CDialogEx
 public:
 	CDateDLG(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CDateDLG();
-
+	BOOL OnInitDialog();
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG1 };
@@ -18,7 +18,6 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton1();

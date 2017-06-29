@@ -14,6 +14,7 @@
 #define IDB_BITMAP5                     134
 #define IDR_MENU1                       135
 #define IDD_DIALOG1                     136
+#define IDD_DIALOG_DATE                 136
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
 #define IDC_BUTTON4                     1003

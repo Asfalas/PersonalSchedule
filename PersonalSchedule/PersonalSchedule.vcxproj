@@ -186,6 +186,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdoAccess.h" />
     <ClInclude Include="DateDLG.h" />
     <ClInclude Include="PersonalSchedule.h" />
     <ClInclude Include="PersonalScheduleDlg.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AdoAccess.cpp" />
     <ClCompile Include="DateDLG.cpp" />
     <ClCompile Include="PersonalSchedule.cpp" />
     <ClCompile Include="PersonalScheduleDlg.cpp" />

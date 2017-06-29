@@ -21,6 +21,20 @@ CDateDLG::~CDateDLG()
 {
 }
 
+BOOL CDateDLG::OnInitDialog()
+{
+	//m_jr_Grid.SetExtendedStyle(LVS_EX_FLATSB
+	//	| LVS_EX_FULLROWSELECT
+	//	| LVS_EX_HEADERDRAGDROP
+	//	| LVS_EX_ONECLICKACTIVATE
+	//	| LVS_EX_GRIDLINES);
+	//m_jr_Grid.InsertColumn(0, _T("日程时间"), LVCFMT_LEFT, 80, 0);
+	//m_jr_Grid.InsertColumn(1, _T("日程标题"), LVCFMT_LEFT, 150, 1);
+	//m_jr_Grid.InsertColumn(2, _T("日程内容"), LVCFMT_LEFT, 280, 2);
+
+	return TRUE;
+}
+
 void CDateDLG::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
