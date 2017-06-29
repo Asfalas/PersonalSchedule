@@ -27,4 +27,7 @@ public:
 	CString m_title;
 	CString m_content;
 	CListCtrl m_jr_Grid;
+	CString m_detail;
+	afx_msg void OnBnClickedNew();
+	void AddtoGrid();
 };
