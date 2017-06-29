@@ -59,7 +59,9 @@ BOOL CDateDLG::OnInitDialog()
 		dq_m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
 		dq_ii++;
 	}
+
 	dq_m_ADOConn.ExitConnect(); //断开数据库连接
+	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);
 	return TRUE;
 }
 
@@ -76,6 +78,9 @@ void CDateDLG::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CDateDLG, CDialogEx)
 	ON_BN_CLICKED(IDC_NEW, &CDateDLG::OnBnClickedNew)
+	ON_BN_CLICKED(IDC_DEL, &CDateDLG::OnBnClickedDel)
+	ON_NOTIFY(NM_CLICK, IDC_LIST1, &CDateDLG::OnNMClickList1)
+	ON_BN_CLICKED(IDC_CHANGE, &CDateDLG::OnBnClickedChange)
 END_MESSAGE_MAP()
 
 
@@ -154,4 +159,104 @@ void CDateDLG::AddtoGrid()
 		dq_ii++;
 	}
 	dq_m_ADOConn.ExitConnect(); //断开数据库连接
+}
+
+void CDateDLG::OnBnClickedDel()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	AdoAccess database;
+	database.OnInitADOConn();
+	_bstr_t sql;
+	sql = "select * from datetable";
+	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	try
+	{
+		database.m_pRecordset->Move(pos, vtMissing);
+		database.m_pRecordset->Delete(adAffectCurrent);
+		database.m_pRecordset->Update();
+		database.ExitConnect();
+	}
+	catch (...)
+	{
+		MessageBox(_T("操作失败"));
+		return;
+	}
+	MessageBox(_T("删除成功"));
+	m_jr_Grid.DeleteAllItems();
+	AddtoGrid();
+	m_detail =_T("");
+	UpdateData(FALSE);
+}
+
+
+void CDateDLG::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	int dq_nItem = -1;
+	LPNMITEMACTIVATE lpNMItemActivate = (LPNMITEMACTIVATE)pNMHDR;
+	if (lpNMItemActivate != NULL)
+	{
+		dq_nItem = lpNMItemActivate->iItem;
+	}
+	pos = m_jr_Grid.GetSelectionMark();
+	m_detail = _T("标题：") + m_jr_Grid.GetItemText(dq_nItem, 1) + "\r\n" + _T("内容：") + m_jr_Grid.GetItemText(dq_nItem, 2);
+	m_title = m_jr_Grid.GetItemText(pos, 1);
+	m_content = m_jr_Grid.GetItemText(pos, 2);
+	UpdateData(FALSE);
+}
+
+
+void CDateDLG::OnBnClickedChange()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//得到选择的时间
+	UpdateData(TRUE);
+	AdoAccess data;
+	int year = m_time.GetYear();
+	int mounth = m_time.GetMonth();
+	int day = m_time.GetDay();
+	CString yearTime;
+	CString mounthTime;
+	CString dayTime;
+	yearTime.Format(_T("%d"), year);
+	mounthTime.Format(_T("%d"), mounth);
+	dayTime.Format(_T("%d"), day);
+	CString timeFinal;
+	timeFinal.Format(_T("%s-%s-%s"), yearTime, mounthTime, dayTime);
+	if (m_title.IsEmpty() || m_content.IsEmpty())
+	{
+		MessageBox(_T("基础信息不能为空！"));
+		return;
+	}
+
+	data.OnInitADOConn();
+	_bstr_t sql;
+	sql = "select * from datetable";
+	data.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	try
+	{
+		data.m_pRecordset->Move((long)pos, vtMissing);
+		data.m_pRecordset->PutCollect("d_date", (_bstr_t)timeFinal);
+		data.m_pRecordset->PutCollect("d_title", (_bstr_t)m_title);
+		data.m_pRecordset->PutCollect("d_content", (_bstr_t)m_content);
+		data.m_pRecordset->Update();
+		data.ExitConnect();
+	}
+	catch (_com_error &e)
+	{
+		AfxMessageBox(_T("链接失败"));
+		CString str;
+		str.Format(_T("%s    %s"), (LPCTSTR)e.Description(), \
+			(LPCTSTR)e.ErrorMessage());
+		AfxMessageBox(str);
+		data.ExitConnect();
+	}
+	MessageBox(_T("修改成功"));
+	m_jr_Grid.DeleteAllItems();
+	AddtoGrid();
 }

@@ -28,6 +28,10 @@ public:
 	CString m_content;
 	CListCtrl m_jr_Grid;
 	CString m_detail;
+	int pos;
 	afx_msg void OnBnClickedNew();
 	void AddtoGrid();
+	afx_msg void OnBnClickedDel();
+	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedChange();
 };
