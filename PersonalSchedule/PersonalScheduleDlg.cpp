@@ -7,6 +7,7 @@
 #include "PersonalScheduleDlg.h"
 #include "afxdialogex.h"
 #include "DateDLG.h"
+#include "AdoAccess.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -72,6 +73,7 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_MESSAGE(WM_SYSTEMTRAY, &CPersonalScheduleDlg::OnSystemtray)
 	ON_COMMAND(ID_32789, &CPersonalScheduleDlg::OnMinimize)
 	ON_COMMAND(ID_32788, &CPersonalScheduleDlg::OnMinShow)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -158,8 +160,8 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	NotifyIcon.uCallbackMessage = WM_SYSTEMTRAY;
 	NotifyIcon.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	Shell_NotifyIcon(NIM_ADD, &NotifyIcon);   //添加系统托盘
-
-
+	OnTimer(0);
+	//AfxMessageBox(_T("111"));
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -373,4 +375,44 @@ void CPersonalScheduleDlg::OnMinShow()
 {
 	// TODO: 在此添加命令处理程序代码
 	AfxGetApp()->m_pMainWnd->ShowWindow(SW_SHOW);
+}
+
+
+void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	COleDateTime sys_time;
+	sys_time = COleDateTime::GetCurrentTime();
+	CString sys_timeFinal;
+	int year = sys_time.GetYear();
+	int mounth = sys_time.GetMonth();
+	int day = sys_time.GetDay();
+	CString yearTime;
+	CString mounthTime;
+	CString dayTime;
+	yearTime.Format(_T("%d"), year);
+	mounthTime.Format(_T("%d"), mounth);
+	dayTime.Format(_T("%d"), day);
+	sys_timeFinal.Format(_T("%s/%s/%s"), yearTime, mounthTime, dayTime);
+	//AfxMessageBox(_T("test"));
+	AdoAccess data;				 // ADOConn类对象
+	data.OnInitADOConn();		 //连接数据库
+	CString sql,date,title,content;
+	sql = "select * from datetable order by d_date asc";                         //设置查询语句
+	data.m_pRecordset = data.GetRecordSet((_bstr_t)sql); //查询
+	while (!data.m_pRecordset->adoEOF)
+	{
+		date=data.m_pRecordset->GetCollect("d_date");
+		title = data.m_pRecordset->GetCollect("d_title");
+		content = data.m_pRecordset->GetCollect("d_content");
+
+		if (date == sys_timeFinal)
+		{
+			MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("消息提示"), MB_OKCANCEL | MB_ICONQUESTION);
+
+		}
+		data.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+	}
+
+	data.ExitConnect(); //断开数据库连接
+
 }

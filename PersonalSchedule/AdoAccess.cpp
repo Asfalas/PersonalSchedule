@@ -9,7 +9,7 @@ void AdoAccess::OnInitADOConn()
 		m_pConnection.CreateInstance("ADODB.Connection");
 		_bstr_t strConnect = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=PSchedule.mdb";
 		m_pConnection->Open(strConnect, _T(""), _T(""), adModeUnknown);
-		AfxMessageBox(_T("连接成功"));
+		//AfxMessageBox(_T("连接成功"));
 	}
 	catch (_com_error &e) {
 		AfxMessageBox(_T("链接失败"));

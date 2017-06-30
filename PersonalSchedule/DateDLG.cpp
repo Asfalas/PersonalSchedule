@@ -46,7 +46,7 @@ BOOL CDateDLG::OnInitDialog()
 	dq_m_ADOConn.OnInitADOConn(); //连接数据库
 	CString dq_sql;
 	int dq_ii = 0;
-	dq_sql="select * from datetable";                         //设置查询语句
+	dq_sql="select * from datetable order by d_date asc";                         //设置查询语句
 	dq_m_ADOConn.m_pRecordset = dq_m_ADOConn.GetRecordSet((_bstr_t)dq_sql); //查询
 	while (!dq_m_ADOConn.m_pRecordset->adoEOF)
 	{
@@ -115,7 +115,7 @@ void CDateDLG::OnBnClickedNew()
 	}
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from datetable";
+	sql = "select * from datetable order by d_date asc";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -145,7 +145,7 @@ void CDateDLG::AddtoGrid()
 	dq_m_ADOConn.OnInitADOConn(); //连接数据库
 	CString dq_sql;
 	int dq_ii = 0;
-	dq_sql.Format(_T("select * from datetable"));                         //设置查询语句
+	dq_sql.Format(_T("select * from datetable order by d_date asc"));                         //设置查询语句
 	dq_m_ADOConn.m_pRecordset = dq_m_ADOConn.GetRecordSet((_bstr_t)dq_sql); //查询
 	while (!dq_m_ADOConn.m_pRecordset->adoEOF)
 	{
@@ -167,7 +167,7 @@ void CDateDLG::OnBnClickedDel()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from datetable";
+	sql = "select * from datetable order by d_date asc";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -234,7 +234,7 @@ void CDateDLG::OnBnClickedChange()
 
 	data.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from datetable";
+	sql = "select * from datetable order by d_date asc";
 	data.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);

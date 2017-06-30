@@ -41,4 +41,5 @@ public:
 	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnMinimize();
 	afx_msg void OnMinShow();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
