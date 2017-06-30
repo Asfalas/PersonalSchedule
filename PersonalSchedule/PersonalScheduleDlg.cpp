@@ -110,22 +110,7 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	//按钮初始化
-	HBITMAP   hBitmap[5];
-	hBitmap[0] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP2));
-	((CWnd *)GetDlgItem(IDC_BUTTON2))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
-	((CButton *)GetDlgItem(IDC_BUTTON2))->SetBitmap(hBitmap[0]);
-	hBitmap[1] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP1));
-	((CWnd *)GetDlgItem(IDC_BUTTON3))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
-	((CButton *)GetDlgItem(IDC_BUTTON3))->SetBitmap(hBitmap[1]);
-	hBitmap[2] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP3));
-	((CWnd *)GetDlgItem(IDC_BUTTON4))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
-	((CButton *)GetDlgItem(IDC_BUTTON4))->SetBitmap(hBitmap[2]);
-	hBitmap[3] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP4));
-	((CWnd *)GetDlgItem(IDC_BUTTON5))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
-	((CButton *)GetDlgItem(IDC_BUTTON5))->SetBitmap(hBitmap[3]);
-	hBitmap[4] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP5));
-	((CWnd *)GetDlgItem(IDC_BUTTON6))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
-	((CButton *)GetDlgItem(IDC_BUTTON6))->SetBitmap(hBitmap[4]);
+	InitButton();
 
 	//开机自启动文件初始化
 	CFileFind finder;   //查找是否存在ini文件，若不存在，则生成一个新的默认设置的ini文件，这样就保证了我们更改后的设置每次都可用
@@ -160,7 +145,11 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	NotifyIcon.uCallbackMessage = WM_SYSTEMTRAY;
 	NotifyIcon.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	Shell_NotifyIcon(NIM_ADD, &NotifyIcon);   //添加系统托盘
+	
+	//定时器设定
 	OnTimer(0);
+	Init_time = InitTime();
+	SetTimer(1, 60000, NULL);
 	//AfxMessageBox(_T("111"));
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -178,6 +167,44 @@ void CPersonalScheduleDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
+void CPersonalScheduleDlg::InitButton() 
+{
+	//按钮初始化
+	HBITMAP   hBitmap[5];
+	hBitmap[0] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP2));
+	((CWnd *)GetDlgItem(IDC_BUTTON2))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON2))->SetBitmap(hBitmap[0]);
+	hBitmap[1] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP1));
+	((CWnd *)GetDlgItem(IDC_BUTTON3))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON3))->SetBitmap(hBitmap[1]);
+	hBitmap[2] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP3));
+	((CWnd *)GetDlgItem(IDC_BUTTON4))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON4))->SetBitmap(hBitmap[2]);
+	hBitmap[3] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP4));
+	((CWnd *)GetDlgItem(IDC_BUTTON5))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON5))->SetBitmap(hBitmap[3]);
+	hBitmap[4] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP5));
+	((CWnd *)GetDlgItem(IDC_BUTTON6))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON6))->SetBitmap(hBitmap[4]);
+}
+
+CString CPersonalScheduleDlg::InitTime()
+{
+	COleDateTime time;
+	time = COleDateTime::GetCurrentTime();
+	CString sys_timeFinal;
+	int year = time.GetYear();
+	int mounth = time.GetMonth();
+	int day = time.GetDay();
+	CString yearTime;
+	CString mounthTime;
+	CString dayTime;
+	yearTime.Format(_T("%d"), year);
+	mounthTime.Format(_T("%d"), mounth);
+	dayTime.Format(_T("%d"), day);
+	sys_timeFinal.Format(_T("%s/%s/%s"), yearTime, mounthTime, dayTime);
+	return sys_timeFinal;
+}
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。  对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
@@ -300,6 +327,7 @@ void CPersonalScheduleDlg::OnAutostart()
 void CPersonalScheduleDlg::OnExit()
 {
 	// TODO: 在此添加命令处理程序代码
+	::Shell_NotifyIcon(NIM_DELETE, &NotifyIcon);
 	AfxGetMainWnd()->SendMessage(WM_CLOSE);
 }
 
@@ -380,31 +408,21 @@ void CPersonalScheduleDlg::OnMinShow()
 
 void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	COleDateTime sys_time;
-	sys_time = COleDateTime::GetCurrentTime();
 	CString sys_timeFinal;
-	int year = sys_time.GetYear();
-	int mounth = sys_time.GetMonth();
-	int day = sys_time.GetDay();
-	CString yearTime;
-	CString mounthTime;
-	CString dayTime;
-	yearTime.Format(_T("%d"), year);
-	mounthTime.Format(_T("%d"), mounth);
-	dayTime.Format(_T("%d"), day);
-	sys_timeFinal.Format(_T("%s/%s/%s"), yearTime, mounthTime, dayTime);
+	sys_timeFinal = InitTime();
+	if (sys_timeFinal == Init_time)
+		return;
 	//AfxMessageBox(_T("test"));
 	AdoAccess data;				 // ADOConn类对象
 	data.OnInitADOConn();		 //连接数据库
-	CString sql,date,title,content;
-	sql = "select * from datetable order by d_date asc";                         //设置查询语句
+	CString sql,date,title,content,isRemind;
+	sql = "select * from datetable";                         //设置查询语句
 	data.m_pRecordset = data.GetRecordSet((_bstr_t)sql); //查询
 	while (!data.m_pRecordset->adoEOF)
 	{
 		date=data.m_pRecordset->GetCollect("d_date");
 		title = data.m_pRecordset->GetCollect("d_title");
 		content = data.m_pRecordset->GetCollect("d_content");
-
 		if (date == sys_timeFinal)
 		{
 			MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("消息提示"), MB_OKCANCEL | MB_ICONQUESTION);
@@ -412,7 +430,6 @@ void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 		}
 		data.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
 	}
-
 	data.ExitConnect(); //断开数据库连接
 
 }

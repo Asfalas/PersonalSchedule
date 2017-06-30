@@ -28,6 +28,9 @@ protected:
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	void InitButton();
+	CString Init_time;
+	CString  InitTime();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OnSystemtray(WPARAM wParam, LPARAM lParam);
