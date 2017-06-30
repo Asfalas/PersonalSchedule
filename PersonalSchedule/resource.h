@@ -14,6 +14,7 @@
 #define IDB_BITMAP5                     134
 #define IDR_MENU1                       135
 #define IDD_DIALOG1                     136
+#define IDR_MENU2                       138
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
 #define IDC_BUTTON4                     1003
@@ -44,13 +45,16 @@
 #define ID_MUSIC                        32785
 #define ID_DAIRY                        32786
 #define ID_MEMO                         32787
+#define ID_32788                        32788
+#define ID_32789                        32789
+#define ID_32790                        32790
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        138
-#define _APS_NEXT_COMMAND_VALUE         32788
+#define _APS_NEXT_RESOURCE_VALUE        139
+#define _APS_NEXT_COMMAND_VALUE         32791
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

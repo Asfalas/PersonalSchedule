@@ -4,7 +4,7 @@
 
 #pragma once
 
-
+#define   WM_SYSTEMTRAY WM_USER+5
 // CPersonalScheduleDlg 对话框
 class CPersonalScheduleDlg : public CDialogEx
 {
@@ -24,17 +24,21 @@ public:
 // 实现
 protected:
 	HICON m_hIcon;
-
+	NOTIFYICONDATA NotifyIcon;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg LRESULT OnSystemtray(WPARAM wParam, LPARAM lParam);
 	void SetAutoRun(BOOL bAutoRun);
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedOk();
+	//afx_msg void OnBnClickedOk();
 	afx_msg void OnAutostart();
 	afx_msg void OnExit();
 	afx_msg void OnBnClickedButton2();
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+	afx_msg void OnMinimize();
+	afx_msg void OnMinShow();
 };

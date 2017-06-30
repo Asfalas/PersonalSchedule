@@ -12,7 +12,7 @@
 #define new DEBUG_NEW
 #endif
 
-BOOL isAutoStart = FALSE;
+//BOOL isAutoStart = FALSE;
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -67,7 +67,11 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_COMMAND(ID_AUTOSTART, &CPersonalScheduleDlg::OnAutostart)
 	ON_COMMAND(ID_EXIT, &CPersonalScheduleDlg::OnExit)
+	ON_COMMAND(ID_32790, &CPersonalScheduleDlg::OnExit)
 	ON_BN_CLICKED(IDC_BUTTON2, &CPersonalScheduleDlg::OnBnClickedButton2)
+	ON_MESSAGE(WM_SYSTEMTRAY, &CPersonalScheduleDlg::OnSystemtray)
+	ON_COMMAND(ID_32789, &CPersonalScheduleDlg::OnMinimize)
+	ON_COMMAND(ID_32788, &CPersonalScheduleDlg::OnMinShow)
 END_MESSAGE_MAP()
 
 
@@ -103,7 +107,7 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-
+	//按钮初始化
 	HBITMAP   hBitmap[5];
 	hBitmap[0] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP2));
 	((CWnd *)GetDlgItem(IDC_BUTTON2))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
@@ -120,6 +124,40 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	hBitmap[4] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP5));
 	((CWnd *)GetDlgItem(IDC_BUTTON6))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON6))->SetBitmap(hBitmap[4]);
+
+	//开机自启动文件初始化
+	CFileFind finder;   //查找是否存在ini文件，若不存在，则生成一个新的默认设置的ini文件，这样就保证了我们更改后的设置每次都可用
+	BOOL ifFind = finder.FindFile(_T("./autorun.ini"));
+	if (!ifFind)
+	{
+		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("FALSE"), _T("./autorun.ini"));
+		CMenu* menu = GetMenu()->GetSubMenu(0);
+		menu->CheckMenuItem(ID_AUTOSTART, MF_UNCHECKED);
+	}
+	else
+	{
+		CString isAutorun;
+		GetPrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T(""), isAutorun.GetBuffer(MAX_PATH), MAX_PATH, _T("./autorun.ini"));
+		if (isAutorun == "FALSE")
+		{
+			CMenu* menu = GetMenu()->GetSubMenu(0);
+			menu->CheckMenuItem(ID_AUTOSTART, MF_UNCHECKED);
+		}
+		else 
+		{
+			CMenu* menu = GetMenu()->GetSubMenu(0);
+			menu->CheckMenuItem(ID_AUTOSTART, MF_CHECKED);
+		}
+	}
+	//系统托盘实现
+	NotifyIcon.cbSize = sizeof(NOTIFYICONDATA);
+	//NotifyIcon.hIcon=AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	NotifyIcon.hIcon = m_hIcon;  //上面那句也可以
+	NotifyIcon.hWnd = m_hWnd;
+	lstrcpy(NotifyIcon.szTip, _T("个人日程管理系统"));
+	NotifyIcon.uCallbackMessage = WM_SYSTEMTRAY;
+	NotifyIcon.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+	Shell_NotifyIcon(NIM_ADD, &NotifyIcon);   //添加系统托盘
 
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -174,6 +212,38 @@ HCURSOR CPersonalScheduleDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+LRESULT CPersonalScheduleDlg::OnSystemtray(WPARAM wParam, LPARAM lParam)
+{
+	if (wParam != IDR_MAINFRAME)
+		return    1;
+	switch (lParam)
+	{
+	case  WM_RBUTTONUP://右键起来时弹出快捷菜单，这里只有一个“关闭”     
+	{
+		LPPOINT    lpoint = new    tagPOINT;
+		::GetCursorPos(lpoint);//得到鼠标位置     
+		CMenu    menu;
+		menu.CreatePopupMenu();//声明一个弹出式菜单     
+							   //增加菜单项“关闭”，点击则发送消息WM_DESTROY给主窗口（已     
+							   //隐藏），将程序结束。     
+		menu.AppendMenu(MF_STRING, WM_DESTROY, _T("关闭"));
+		//确定弹出式菜单的位置     
+		menu.TrackPopupMenu(TPM_LEFTALIGN, lpoint->x, lpoint->y, this);
+		//资源回收     
+		HMENU    hmenu = menu.Detach();
+		menu.DestroyMenu();
+		delete    lpoint;
+	}
+	break;
+	case    WM_LBUTTONDBLCLK://双击左键的处理     
+	{
+		this->ShowWindow(SW_SHOW);//简单的显示主窗口完事儿     
+	}
+	break;
+	}
+	return 0;
+}
+
 void CPersonalScheduleDlg::SetAutoRun(BOOL bAutoRun)
 {
 	HKEY hKey;
@@ -206,19 +276,21 @@ void CPersonalScheduleDlg::SetAutoRun(BOOL bAutoRun)
 
 void CPersonalScheduleDlg::OnAutostart()
 {
-	if (isAutoStart == FALSE)
+	CString isAutorun;
+	GetPrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T(""), isAutorun.GetBuffer(MAX_PATH), MAX_PATH, _T("./autorun.ini"));
+	if (isAutorun == "FALSE") 
 	{
 		SetAutoRun(TRUE);
 		CMenu* menu = GetMenu()->GetSubMenu(0);
 		menu->CheckMenuItem(ID_AUTOSTART, MF_CHECKED);
-		isAutoStart = TRUE;
+		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("TRUE"), _T("./autorun.ini"));
 	}
-	else
+	else 
 	{
 		SetAutoRun(FALSE);
 		CMenu* menu = GetMenu()->GetSubMenu(0);
 		menu->CheckMenuItem(ID_AUTOSTART, MF_UNCHECKED);
-		isAutoStart = FALSE;
+		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("FALSE"), _T("./autorun.ini"));
 	}
 }
 
@@ -238,4 +310,67 @@ void CPersonalScheduleDlg::OnBnClickedButton2()
 	nRes = tipDlg.DoModal();  // 弹出对话框   
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
+}
+
+
+//WindowProc中增加的代码  
+LRESULT CPersonalScheduleDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	// TODO: Add your specialized code here and/or call the base class  
+	switch (message) //判断消息类型  
+	{
+	case WM_SYSTEMTRAY:
+		//如果是用户定义的消息   
+		if (lParam == WM_LBUTTONDBLCLK)
+
+		{
+			//鼠标双击时主窗口出现   
+			if (AfxGetApp()->m_pMainWnd->IsWindowVisible()) //判断窗口当前状态  
+			{
+				AfxGetApp()->m_pMainWnd->ShowWindow(SW_HIDE); //隐藏窗口  
+			}
+			else
+			{
+				AfxGetApp()->m_pMainWnd->ShowWindow(SW_SHOW); //显示窗口  
+			}
+
+		}
+		else if (lParam == WM_RBUTTONDOWN)
+		{ //鼠标右键单击弹出选单   
+			CMenu menu;
+			menu.LoadMenu(IDR_MENU2); //载入事先定义的选单   
+			CMenu *pMenu = menu.GetSubMenu(0);
+			CPoint pos;
+			GetCursorPos(&pos);
+			pMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pos.x, pos.y, AfxGetMainWnd());
+		}
+		break;
+	case WM_SYSCOMMAND:
+		//如果是系统消息   
+		if (wParam == SC_MINIMIZE)
+		{
+			//接收到最小化消息时主窗口隐藏   
+			AfxGetApp()->m_pMainWnd->ShowWindow(SW_HIDE);
+			return 0;
+		}
+		if (wParam == SC_CLOSE)
+		{
+			::Shell_NotifyIcon(NIM_DELETE, &NotifyIcon); //关闭时删除系统托盘图标  
+		}
+		break;
+	}
+	return CDialog::WindowProc(message, wParam, lParam);
+}
+
+void CPersonalScheduleDlg::OnMinimize()
+{
+	// TODO: 在此添加命令处理程序代码
+	AfxGetApp()->m_pMainWnd->ShowWindow(SW_HIDE);
+}
+
+
+void CPersonalScheduleDlg::OnMinShow()
+{
+	// TODO: 在此添加命令处理程序代码
+	AfxGetApp()->m_pMainWnd->ShowWindow(SW_SHOW);
 }
