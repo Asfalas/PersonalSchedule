@@ -187,6 +187,8 @@ void CDateDLG::OnBnClickedDel()
 	m_jr_Grid.DeleteAllItems();
 	AddtoGrid();
 	m_detail =_T("");
+	m_title = _T("");
+	m_content = _T("");
 	UpdateData(FALSE);
 }
 
