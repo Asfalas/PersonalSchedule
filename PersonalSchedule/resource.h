@@ -15,6 +15,8 @@
 #define IDR_MENU1                       135
 #define IDD_DIALOG1                     136
 #define IDR_MENU2                       138
+#define IDD_DIALOG2                     139
+#define IDD_DIALOG5                     140
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
 #define IDC_BUTTON4                     1003
@@ -28,6 +30,14 @@
 #define IDC_CHANGE                      1011
 #define IDC_EDIT3                       1012
 #define IDC_DEL                         1013
+#define IDC_filename                    1016
+#define IDC_filechoice                  1017
+#define IDC_play                        1018
+#define IDC_pause                       1019
+#define IDC_stop                        1020
+#define IDC_CLEAR                       1021
+#define IDC_SCROLLBAR1                  1022
+#define IDC_vol                         1023
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -53,9 +63,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        139
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         32791
-#define _APS_NEXT_CONTROL_VALUE         1016
+#define _APS_NEXT_CONTROL_VALUE         1033
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -8,11 +8,16 @@
 #include "afxdialogex.h"
 #include "DateDLG.h"
 #include "AdoAccess.h"
+#include "MusicDlg.h"
+#include <MMSystem.h>  
+#include <Digitalv.h>  
 
+#pragma comment(lib, "Winmm.lib")  
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
+DWORD play();
+void stop(DWORD DeviceId);
 //BOOL isAutoStart = FALSE;
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -75,6 +80,8 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_COMMAND(ID_32789, &CPersonalScheduleDlg::OnMinimize)
 	ON_COMMAND(ID_32788, &CPersonalScheduleDlg::OnMinShow)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON4, &CPersonalScheduleDlg::OnMusic)
+	ON_COMMAND(ID_HOLIDAY, &CPersonalScheduleDlg::OnHoliday)
 END_MESSAGE_MAP()
 
 
@@ -409,7 +416,9 @@ void CPersonalScheduleDlg::OnMinShow()
 
 void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	CString sys_timeFinal;
+	CString sys_timeFinal,path,name,vol;
+	GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), path.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
+	GetPrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), vol.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
 	sys_timeFinal = InitTime();
 	if (sys_timeFinal == Init_time)
 		return;
@@ -419,6 +428,8 @@ void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 	CString sql,date,title,content,isRemind;
 	sql = "select * from datetable";                         //设置查询语句
 	data.m_pRecordset = data.GetRecordSet((_bstr_t)sql); //查询
+	BOOL flag = false;
+	DWORD myDevice;
 	while (!data.m_pRecordset->adoEOF)
 	{
 		date=data.m_pRecordset->GetCollect("d_date");
@@ -426,11 +437,67 @@ void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 		content = data.m_pRecordset->GetCollect("d_content");
 		if (date == sys_timeFinal)
 		{
-			MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("消息提示"), MB_OKCANCEL | MB_ICONQUESTION);
-
+			if (!flag) 
+			{
+				myDevice=play();
+				flag = true;
+			}
+			MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("日程提醒"),MB_ICONQUESTION);
+			
 		}
 		data.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
 	}
+	stop(myDevice);
 	data.ExitConnect(); //断开数据库连接
+}
 
+DWORD play()
+{
+	CString path, vol;
+	GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), path.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
+	GetPrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), vol.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
+	 MCI_OPEN_PARMS openParms;//MCI_OPEN命令需要参数结构体  
+    openParms.lpstrDeviceType=_T("MPEGvideo");//MP3的文件设备ID为MPEGvideo  
+    openParms.lpstrElementName=path;//MP3文件的存放路径  
+    //发送命令  
+    mciSendCommand(  
+        NULL,//打开设备不需要设备ID  
+        MCI_OPEN,//MCI_OPEN,此命令表示打开设备  
+        MCI_OPEN_ELEMENT|MCI_OPEN_TYPE|MCI_WAIT,  
+        (DWORD)(LPVOID(&openParms)));//传递MCI_OPEN_PARMS参数  
+    WORD m_wDeviceID=openParms.wDeviceID;  
+    //2、播放设备  
+    MCI_PLAY_PARMS playParms;//MCI_PLAY命令需要的参数结构体  
+    mciSendCommand(  
+        m_wDeviceID,//需要的设备ID  
+        MCI_PLAY,//此命令播放设备  
+        MCI_NOTIFY,//等待播放文件结束，然后返回  
+        (DWORD)(LPVOID(&playParms)));//传递MCI_PLAY_PARMS参数  
+	
+	return m_wDeviceID;
+}
+void stop(DWORD DeviceId)
+{
+	mciSendCommand(DeviceId, MCI_STOP, 0, 0);
+	mciSendCommand(DeviceId, MCI_CLOSE, 0, 0);
+}
+void CPersonalScheduleDlg::OnMusic()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	CMusicDlg mDlg;           // 构造对话框类CTipDlg的实例   
+	nRes = mDlg.DoModal();  // 弹出对话框   
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;
+}
+
+
+void CPersonalScheduleDlg::OnHoliday()
+{
+	// TODO: 在此添加命令处理程序代码
+	//INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	//CHolidayDlg hDlg;           // 构造对话框类CTipDlg的实例   
+	//nRes = hDlg.DoModal();  // 弹出对话框   
+	//if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+	//	return;
 }

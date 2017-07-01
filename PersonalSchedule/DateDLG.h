@@ -34,4 +34,5 @@ public:
 	afx_msg void OnBnClickedDel();
 	afx_msg void OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedChange();
+	afx_msg void OnBnClickedClear();
 };
