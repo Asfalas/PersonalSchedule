@@ -188,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="AdoAccess.h" />
     <ClInclude Include="DateDLG.h" />
+    <ClInclude Include="FestivalDlg.h" />
     <ClInclude Include="MusicDlg.h" />
     <ClInclude Include="PersonalSchedule.h" />
     <ClInclude Include="PersonalScheduleDlg.h" />
@@ -198,6 +199,7 @@
   <ItemGroup>
     <ClCompile Include="AdoAccess.cpp" />
     <ClCompile Include="DateDLG.cpp" />
+    <ClCompile Include="FestivalDlg.cpp" />
     <ClCompile Include="MusicDlg.cpp" />
     <ClCompile Include="PersonalSchedule.cpp" />
     <ClCompile Include="PersonalScheduleDlg.cpp" />

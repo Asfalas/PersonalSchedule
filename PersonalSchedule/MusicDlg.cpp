@@ -54,11 +54,7 @@ BOOL CMusicDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	m_slider.SetScrollRange(1, 100);
 	// 设置水平滚动条的初始位置为20   
-	m_slider.SetScrollPos(20);
-	// 在编辑框中显示20   
-	SetDlgItemInt(IDC_SCROLLBAR1, 20);
-	m_int = 20;
-	UpdateData(false);
+
 	if (!InitMusic())
 	{
 		GetDlgItem(IDC_play)->EnableWindow(false); //文件没有读取时所有按钮不可选
@@ -67,6 +63,11 @@ BOOL CMusicDlg::OnInitDialog()
 		GetDlgItem(IDC_vol)->EnableWindow(false);
 		GetDlgItem(IDC_SCROLLBAR1)->EnableWindow(false);
 	}
+	m_slider.SetScrollPos(_ttoi(m_vol));
+	// 在编辑框中显示20   
+	SetDlgItemInt(IDC_SCROLLBAR1, _ttoi(m_vol));
+	m_int = _ttoi(m_vol);
+	UpdateData(false);
 	return TRUE;
 }
 
@@ -76,7 +77,7 @@ BOOL CMusicDlg::InitMusic() {
 	if (!ifFind) {
 		::WritePrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), _T("./music.ini"));
 		::WritePrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), _T("./music.ini"));
-		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), _T("./music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), _T("20"), _T("./music.ini"));
 		return false;
 	}
 	else
@@ -121,7 +122,7 @@ void CMusicDlg::play()
 	MCI_DGV_SETAUDIO_PARMS setvolume; //设置音量的参数结构体  
 	setvolume.dwCallback = NULL; //  
 	setvolume.dwItem = MCI_DGV_SETAUDIO_VOLUME; //动作是设置音量  
-	setvolume.dwValue = _ttoi(m_vol); //音量值是vol  
+	setvolume.dwValue = _ttoi(m_vol)*10; //音量值是vol  
 	mciSendCommand(DeviceId, MCI_SETAUDIO, MCI_DGV_SETAUDIO_ITEM | MCI_DGV_SETAUDIO_VALUE, (DWORD)(LPVOID)&setvolume);
 }
 
@@ -166,6 +167,8 @@ void CMusicDlg::OnBnClickedfilechoice()
 		::WritePrivateProfileString(_T("Music Info"), _T("m_path"), strFilepath, _T("./music.ini"));
 		::WritePrivateProfileString(_T("Music Info"), _T("m_name"), strFilename, _T("./music.ini"));
 		SetDlgItemText(IDC_filename, strFilename);
+		m_path = strFilepath;
+		m_name = strFilename;
 		Load(this->m_hWnd, strFilepath);
 	}
 	GetDlgItem(IDC_play)->EnableWindow(true); //文件读取成功时所有按钮变成可选  
@@ -273,6 +276,9 @@ void CMusicDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	}
 
 	// 设置滚动块位置  
+	CString p;
+	p.Format(_T("%d"), pos);
+	::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), p, _T("./music.ini"));
 	m_slider.SetScrollPos(pos);
 	setvolume(pos);
 
@@ -295,6 +301,7 @@ LRESULT CMusicDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return CDialog::WindowProc(message, wParam, lParam);
 }
+
 
 void CMusicDlg::OnBnClickedOk()
 {

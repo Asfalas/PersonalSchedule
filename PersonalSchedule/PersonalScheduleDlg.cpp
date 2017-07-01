@@ -11,6 +11,7 @@
 #include "MusicDlg.h"
 #include <MMSystem.h>  
 #include <Digitalv.h>  
+#include "FestivalDlg.h"
 
 #pragma comment(lib, "Winmm.lib")  
 #ifdef _DEBUG
@@ -455,7 +456,7 @@ DWORD play()
 {
 	CString path, vol;
 	GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), path.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
-	GetPrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), vol.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
+	GetPrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), vol.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
 	 MCI_OPEN_PARMS openParms;//MCI_OPEN命令需要参数结构体  
     openParms.lpstrDeviceType=_T("MPEGvideo");//MP3的文件设备ID为MPEGvideo  
     openParms.lpstrElementName=path;//MP3文件的存放路径  
@@ -473,6 +474,12 @@ DWORD play()
         MCI_PLAY,//此命令播放设备  
         MCI_NOTIFY,//等待播放文件结束，然后返回  
         (DWORD)(LPVOID(&playParms)));//传递MCI_PLAY_PARMS参数  
+	
+	MCI_DGV_SETAUDIO_PARMS setvolume; //设置音量的参数
+	setvolume.dwCallback = NULL; //
+	setvolume.dwItem = MCI_DGV_SETAUDIO_VOLUME; //动作是设置音量
+	setvolume.dwValue = _ttoi(vol) * 10; //音量值是vol
+	mciSendCommand(m_wDeviceID, MCI_SETAUDIO, MCI_DGV_SETAUDIO_ITEM | MCI_DGV_SETAUDIO_VALUE, (DWORD)(LPVOID)&setvolume);
 	
 	return m_wDeviceID;
 }
@@ -495,9 +502,9 @@ void CPersonalScheduleDlg::OnMusic()
 void CPersonalScheduleDlg::OnHoliday()
 {
 	// TODO: 在此添加命令处理程序代码
-	//INT_PTR nRes;             // 用于保存DoModal函数的返回值   
-	//CHolidayDlg hDlg;           // 构造对话框类CTipDlg的实例   
-	//nRes = hDlg.DoModal();  // 弹出对话框   
-	//if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
-	//	return;
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	CFestivalDlg hDlg;           // 构造对话框类CTipDlg的实例   
+	nRes = hDlg.DoModal();  // 弹出对话框   
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;
 }
