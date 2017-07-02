@@ -34,7 +34,7 @@ void CDairyDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CDairyDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CDairyDlg, CDialogEx) 
 	ON_BN_CLICKED(IDC_DADD, &CDairyDlg::OnBnClickedDadd)
 	ON_BN_CLICKED(IDC_DCHANGE, &CDairyDlg::OnBnClickedDchange)
 	ON_BN_CLICKED(IDC_DDEL, &CDairyDlg::OnBnClickedDdel)
@@ -153,8 +153,6 @@ BOOL CDairyDlg::CheckTitle(CString title,int place)
 }
 
 
-
-
 void CDairyDlg::OnBnClickedDadd()
 {
 	UpdateData(TRUE);
@@ -259,27 +257,27 @@ void CDairyDlg::OnBnClickedDdel()
 
 void CDairyDlg::OnDtnDatetimechangeDdate(NMHDR *pNMHDR, LRESULT *pResult)
 {
-		LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
-		// TODO: 在此添加控件通知处理程序代码
-		UpdateData(TRUE);
-		int year = m_ddate.GetYear();
-		int mounth = m_ddate.GetMonth();
-		int day = m_ddate.GetDay();
-		CString yearTime;
-		CString mounthTime;
-		CString dayTime;
-		yearTime.Format(_T("%d"), year);
-		mounthTime.Format(_T("%d"), mounth);
-		dayTime.Format(_T("%d"), day);
-		my_date.Format(_T("%s/%s/%s"), yearTime, mounthTime, dayTime);
-		AddtoGrid(my_date);
-		*pResult = 0;
+	LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+	int year = m_ddate.GetYear();
+	int mounth = m_ddate.GetMonth();
+	int day = m_ddate.GetDay();
+	CString yearTime;
+	CString mounthTime;
+	CString dayTime;
+	yearTime.Format(_T("%d"), year);
+	mounthTime.Format(_T("%d"), mounth);
+	dayTime.Format(_T("%d"), day);
+	my_date.Format(_T("%s/%s/%s"), yearTime, mounthTime, dayTime);
+	AddtoGrid(my_date);
+	*pResult = 0;
 }
 
 
 void CDairyDlg::OnCbnSelchangeDtitle()
 {
-		// TODO: 在此添加控件通知处理程序代码
+	// TODO: 在此添加控件通知处理程序代码
 	CString strWeb;
 	int nSel;
 	// 获取组合框控件的列表框中选中项的索引   

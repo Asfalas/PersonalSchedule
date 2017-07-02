@@ -70,16 +70,18 @@
 #define IDC_CTITLE                      1065
 #define IDC_CCONTENT                    1066
 #define IDC_COMBO1                      1067
+#define IDC_MTITLE                      1067
 #define IDC_DADD                        1068
 #define IDC_DCHANGE                     1069
 #define IDC_MADD                        1069
 #define IDC_DDEL                        1070
 #define IDC_MCHANGE                     1070
 #define IDC_MDEL                        1071
-#define IDC_MDATE                       1071
 #define IDC_DDATE                       1071
 #define IDC_DTITLE                      1072
 #define IDC_DCONTENT                    1073
+#define IDC_MDATE                       1074
+#define IDC_MCONTENT                    1075
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -107,7 +109,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        155
 #define _APS_NEXT_COMMAND_VALUE         32791
-#define _APS_NEXT_CONTROL_VALUE         1074
+#define _APS_NEXT_CONTROL_VALUE         1076
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

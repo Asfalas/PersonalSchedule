@@ -1,4 +1,6 @@
 #pragma once
+#include "ATLComTime.h"
+#include "afxwin.h"
 
 
 // CMemoDlg ¶Ô»°¿ò
@@ -27,4 +29,15 @@ protected:
 	CString InitTime();
 
 	DECLARE_MESSAGE_MAP()
+public:
+	CString m_mcontent;
+	COleDateTime m_mdate;
+	CComboBox m_mtitle;
+	CString m_mcurrent;
+	afx_msg void OnBnClickedMadd();
+	BOOL CheckTitle(CString title, int place);
+	afx_msg void OnBnClickedMchange();
+	afx_msg void OnBnClickedMdel();
+	afx_msg void OnDtnDatetimechangeMdate(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnCbnSelchangeMtitle();
 };
