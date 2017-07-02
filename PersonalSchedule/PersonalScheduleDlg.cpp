@@ -13,6 +13,8 @@
 #include <Digitalv.h>  
 #include "FestivalDlg.h"
 #include "TimeDlg.h"
+#include "DairyDlg.h"
+#include "MemoDlg.h"
 
 #pragma comment(lib, "Winmm.lib")  
 #ifdef _DEBUG
@@ -57,7 +59,6 @@ END_MESSAGE_MAP()
 // CPersonalScheduleDlg 对话框
 
 
-
 CPersonalScheduleDlg::CPersonalScheduleDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_PERSONALSCHEDULE_DIALOG, pParent)
 {
@@ -88,6 +89,9 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_COMMAND(ID_HELP, &CPersonalScheduleDlg::OnHelp)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPersonalScheduleDlg::OnBnClickedButton3)
 	ON_COMMAND(ID_TIME, &CPersonalScheduleDlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON5, &CPersonalScheduleDlg::OnBnClickedDairy)
+	ON_COMMAND(ID_DAIRY, &CPersonalScheduleDlg::OnBnClickedDairy)
+	ON_BN_CLICKED(IDC_BUTTON6, &CPersonalScheduleDlg::OnBnClickedMemo)
 END_MESSAGE_MAP()
 
 
@@ -532,6 +536,28 @@ void CPersonalScheduleDlg::OnBnClickedButton3()
 	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
 	CTimeDlg tDlg;           // 构造对话框类CTipDlg的实例   
 	nRes = tDlg.DoModal();  // 弹出对话框   
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;
+}
+
+
+void CPersonalScheduleDlg::OnBnClickedDairy()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	CDairyDlg dDlg;           // 构造对话框类CTipDlg的实例   
+	nRes = dDlg.DoModal();  // 弹出对话框   
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;
+}
+
+
+void CPersonalScheduleDlg::OnBnClickedMemo()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	CMemoDlg mDlg;           // 构造对话框类CTipDlg的实例   
+	nRes = mDlg.DoModal();  // 弹出对话框   
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
 }

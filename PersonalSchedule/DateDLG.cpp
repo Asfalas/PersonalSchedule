@@ -29,10 +29,8 @@ BOOL CDateDLG::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	CRect rect;
-
 	// 获取编程语言列表视图控件的位置和大小   
 	m_jr_Grid.GetClientRect(&rect);
-
 	// 为列表视图控件添加全行选中和栅格风格   
 	m_jr_Grid.SetExtendedStyle(m_jr_Grid.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
@@ -40,25 +38,6 @@ BOOL CDateDLG::OnInitDialog()
 	m_jr_Grid.InsertColumn(0, _T("日期"), LVCFMT_CENTER, rect.Width() / 3, 0);
 	m_jr_Grid.InsertColumn(1, _T("标题"), LVCFMT_CENTER, rect.Width() / 3, 1);
 	m_jr_Grid.InsertColumn(2, _T("内容"), LVCFMT_CENTER, rect.Width() / 3, 2);
-
-	// 在列表视图控件中插入列表项，并设置列表子项文本   
-	//AdoAccess m_ADOConn;       // ADOConn类对象
-	//m_ADOConn.OnInitADOConn(); //连接数据库
-	//CString sql;
-	//int i = 0;
-	//sql ="select * from datetable order by d_date asc";                         //设置查询语句
-	//m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
-	//while (!m_ADOConn.m_pRecordset->adoEOF)
-	//{
-	//	//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
-	//	m_jr_Grid.InsertItem(i, _T(""));
-	//	//向列表视图控件中插入列
-	//	m_jr_Grid.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
-	//	m_jr_Grid.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
-	//	m_jr_Grid.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
-	//	m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
-	//	i++;
-	//}
 	AddtoGrid();
 	//m_ADOConn.ExitConnect(); //断开数据库连接
 	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);

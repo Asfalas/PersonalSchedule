@@ -49,4 +49,6 @@ public:
 	afx_msg void OnHoliday();
 	afx_msg void OnHelp();
 	afx_msg void OnBnClickedButton3();
+	afx_msg void OnBnClickedDairy();
+	afx_msg void OnBnClickedMemo();
 };

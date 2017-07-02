@@ -54,6 +54,12 @@
     <ClInclude Include="CtimepopDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DairyDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PersonalSchedule.cpp">
@@ -84,6 +90,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CtimepopDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DairyDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

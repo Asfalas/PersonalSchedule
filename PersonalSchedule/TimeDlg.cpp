@@ -131,6 +131,8 @@ void CTimeDlg::OnNMClickTlist(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		GetDlgItem(IDC_TCHANGE)->EnableWindow(false);
 		GetDlgItem(IDC_TDEL)->EnableWindow(false);
+		m_tcontent = _T("");
+		UpdateData(FALSE);
 		return;
 	}
 	GetDlgItem(IDC_TCHANGE)->EnableWindow(true);
