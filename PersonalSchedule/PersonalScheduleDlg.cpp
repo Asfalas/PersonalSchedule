@@ -12,6 +12,7 @@
 #include <MMSystem.h>  
 #include <Digitalv.h>  
 #include "FestivalDlg.h"
+#include "TimeDlg.h"
 
 #pragma comment(lib, "Winmm.lib")  
 #ifdef _DEBUG
@@ -82,7 +83,11 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_COMMAND(ID_32788, &CPersonalScheduleDlg::OnMinShow)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON4, &CPersonalScheduleDlg::OnMusic)
+	ON_COMMAND(ID_MUSIC, &CPersonalScheduleDlg::OnMusic)
 	ON_COMMAND(ID_HOLIDAY, &CPersonalScheduleDlg::OnHoliday)
+	ON_COMMAND(ID_HELP, &CPersonalScheduleDlg::OnHelp)
+	ON_BN_CLICKED(IDC_BUTTON3, &CPersonalScheduleDlg::OnBnClickedButton3)
+	ON_COMMAND(ID_TIME, &CPersonalScheduleDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -250,6 +255,7 @@ HCURSOR CPersonalScheduleDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
 LRESULT CPersonalScheduleDlg::OnSystemtray(WPARAM wParam, LPARAM lParam)
 {
 	if (wParam != IDR_MAINFRAME)
@@ -281,6 +287,7 @@ LRESULT CPersonalScheduleDlg::OnSystemtray(WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
+
 
 void CPersonalScheduleDlg::SetAutoRun(BOOL bAutoRun)
 {
@@ -401,6 +408,7 @@ LRESULT CPersonalScheduleDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPa
 	return CDialog::WindowProc(message, wParam, lParam);
 }
 
+
 void CPersonalScheduleDlg::OnMinimize()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -430,7 +438,7 @@ void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 	sql = "select * from datetable";                         //设置查询语句
 	data.m_pRecordset = data.GetRecordSet((_bstr_t)sql); //查询
 	BOOL flag = false;
-	DWORD myDevice;
+	DWORD myDevice=NULL;
 	while (!data.m_pRecordset->adoEOF)
 	{
 		date=data.m_pRecordset->GetCollect("d_date");
@@ -505,6 +513,25 @@ void CPersonalScheduleDlg::OnHoliday()
 	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
 	CFestivalDlg hDlg;           // 构造对话框类CTipDlg的实例   
 	nRes = hDlg.DoModal();  // 弹出对话框   
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;
+}
+
+
+void CPersonalScheduleDlg::OnHelp()
+{
+	// TODO: 在此添加命令处理程序代码
+
+	MessageBox(_T("个人日程管理系统 1.0 版\r\n         版权所有 (C)2017\r\n              -zhang"), _T("系统信息"), NULL);
+}
+
+//定时提醒
+void CPersonalScheduleDlg::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	CTimeDlg tDlg;           // 构造对话框类CTipDlg的实例   
+	nRes = tDlg.DoModal();  // 弹出对话框   
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
 }

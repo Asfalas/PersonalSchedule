@@ -187,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdoAccess.h" />
+    <ClInclude Include="CtimepopDlg.h" />
     <ClInclude Include="DateDLG.h" />
     <ClInclude Include="FestivalDlg.h" />
     <ClInclude Include="MusicDlg.h" />
@@ -195,9 +196,12 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TimeDlg.h" />
+    <ClInclude Include="TimepopDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdoAccess.cpp" />
+    <ClCompile Include="CtimepopDlg.cpp" />
     <ClCompile Include="DateDLG.cpp" />
     <ClCompile Include="FestivalDlg.cpp" />
     <ClCompile Include="MusicDlg.cpp" />
@@ -209,6 +213,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TimeDlg.cpp" />
+    <ClCompile Include="TimepopDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PersonalSchedule.rc" />

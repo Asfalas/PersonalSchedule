@@ -47,4 +47,6 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnMusic();
 	afx_msg void OnHoliday();
+	afx_msg void OnHelp();
+	afx_msg void OnBnClickedButton3();
 };

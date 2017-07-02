@@ -42,25 +42,25 @@ BOOL CDateDLG::OnInitDialog()
 	m_jr_Grid.InsertColumn(2, _T("内容"), LVCFMT_CENTER, rect.Width() / 3, 2);
 
 	// 在列表视图控件中插入列表项，并设置列表子项文本   
-	AdoAccess m_ADOConn;       // ADOConn类对象
-	m_ADOConn.OnInitADOConn(); //连接数据库
-	CString sql;
-	int i = 0;
-	sql ="select * from datetable order by d_date asc";                         //设置查询语句
-	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
-	while (!m_ADOConn.m_pRecordset->adoEOF)
-	{
-		//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
-		m_jr_Grid.InsertItem(i, _T(""));
-		//向列表视图控件中插入列
-		m_jr_Grid.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
-		m_jr_Grid.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
-		m_jr_Grid.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
-		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
-		i++;
-	}
-
-	m_ADOConn.ExitConnect(); //断开数据库连接
+	//AdoAccess m_ADOConn;       // ADOConn类对象
+	//m_ADOConn.OnInitADOConn(); //连接数据库
+	//CString sql;
+	//int i = 0;
+	//sql ="select * from datetable order by d_date asc";                         //设置查询语句
+	//m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
+	//while (!m_ADOConn.m_pRecordset->adoEOF)
+	//{
+	//	//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
+	//	m_jr_Grid.InsertItem(i, _T(""));
+	//	//向列表视图控件中插入列
+	//	m_jr_Grid.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
+	//	m_jr_Grid.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
+	//	m_jr_Grid.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
+	//	m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+	//	i++;
+	//}
+	AddtoGrid();
+	//m_ADOConn.ExitConnect(); //断开数据库连接
 	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);
 	return TRUE;
 }
@@ -75,7 +75,6 @@ void CDateDLG::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_detail);
 }
 
-
 BEGIN_MESSAGE_MAP(CDateDLG, CDialogEx)
 	ON_BN_CLICKED(IDC_NEW, &CDateDLG::OnBnClickedNew)
 	ON_BN_CLICKED(IDC_DEL, &CDateDLG::OnBnClickedDel)
@@ -87,12 +86,10 @@ END_MESSAGE_MAP()
 
 // CDateDLG 消息处理程序
 
-
 void CDateDLG::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
 }
-
 
 void CDateDLG::OnBnClickedNew()
 {
@@ -146,24 +143,24 @@ void CDateDLG::OnBnClickedNew()
 
 void CDateDLG::AddtoGrid()
 {
-	AdoAccess dq_m_ADOConn;       // ADOConn类对象
-	dq_m_ADOConn.OnInitADOConn(); //连接数据库
-	CString dq_sql;
-	int dq_ii = 0;
-	dq_sql.Format(_T("select * from datetable order by d_date asc"));                         //设置查询语句
-	dq_m_ADOConn.m_pRecordset = dq_m_ADOConn.GetRecordSet((_bstr_t)dq_sql); //查询
-	while (!dq_m_ADOConn.m_pRecordset->adoEOF)
+	AdoAccess m_ADOConn;       // ADOConn类对象
+	m_ADOConn.OnInitADOConn(); //连接数据库
+	CString sql;
+	int i = 0;
+	sql.Format(_T("select * from datetable order by d_date asc"));                         //设置查询语句
+	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
+	while (!m_ADOConn.m_pRecordset->adoEOF)
 	{
 		//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
-		m_jr_Grid.InsertItem(dq_ii, _T(""));
+		m_jr_Grid.InsertItem(i, _T(""));
 		//向列表视图控件中插入列
-		m_jr_Grid.SetItemText(dq_ii, 0, (LPCTSTR)_bstr_t(dq_m_ADOConn.m_pRecordset->GetCollect("d_date")));
-		m_jr_Grid.SetItemText(dq_ii, 1, (LPCTSTR)_bstr_t(dq_m_ADOConn.m_pRecordset->GetCollect("d_title")));
-		m_jr_Grid.SetItemText(dq_ii, 2, (LPCTSTR)_bstr_t(dq_m_ADOConn.m_pRecordset->GetCollect("d_content")));
-		dq_m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
-		dq_ii++;
+		m_jr_Grid.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
+		m_jr_Grid.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
+		m_jr_Grid.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
+		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+		i++;
 	}
-	dq_m_ADOConn.ExitConnect(); //断开数据库连接
+	m_ADOConn.ExitConnect(); //断开数据库连接
 }
 
 void CDateDLG::OnBnClickedDel()
@@ -197,7 +194,6 @@ void CDateDLG::OnBnClickedDel()
 	UpdateData(FALSE);
 }
 
-
 void CDateDLG::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -214,7 +210,6 @@ void CDateDLG::OnNMClickList1(NMHDR *pNMHDR, LRESULT *pResult)
 	m_content = m_jr_Grid.GetItemText(pos, 2);
 	UpdateData(FALSE);
 }
-
 
 void CDateDLG::OnBnClickedChange()
 {
@@ -267,7 +262,6 @@ void CDateDLG::OnBnClickedChange()
 	m_jr_Grid.DeleteAllItems();
 	AddtoGrid();
 }
-
 
 void CDateDLG::OnBnClickedClear()
 {

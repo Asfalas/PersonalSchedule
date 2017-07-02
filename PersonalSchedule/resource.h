@@ -18,6 +18,8 @@
 #define IDD_DIALOG2                     139
 #define IDD_DIALOG5                     140
 #define IDD_DIALOG3                     144
+#define IDD_NEWTIME                     147
+#define IDD_CTIME                       149
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
 #define IDC_BUTTON4                     1003
@@ -25,6 +27,8 @@
 #define IDC_BUTTON6                     1005
 #define IDC_DATETIMEPICKER1             1006
 #define IDC_EDIT1                       1007
+#define IDC_DATETIMEPICKER2             1007
+#define IDC_CTIME                       1007
 #define IDC_EDIT2                       1008
 #define IDC_LIST1                       1009
 #define IDC_NEW                         1010
@@ -41,7 +45,6 @@
 #define IDC_vol                         1023
 #define IDC_HLIST                       1033
 #define IDC_HNEW                        1034
-#define IDC_DATE1                       1035
 #define IDC_HTITLE                      1036
 #define IDC_HCONTENT                    1037
 #define IDC_HCHANGE                     1038
@@ -49,6 +52,22 @@
 #define IDC_HCLEAR                      1040
 #define IDC_HDETAIL                     1041
 #define IDC_HDATE                       1042
+#define IDC_TLIST                       1046
+#define IDC_TNEW                        1047
+#define IDC_TCHANGE                     1048
+#define IDC_TTIME                       1054
+#define IDC_TCONTENT                    1055
+#define IDC_RADIO_ONCE                  1056
+#define IDC_RADIO_PERDAY                1057
+#define IDC_RADIO_PERWEEK               1058
+#define IDC_TDEL                        1059
+#define IDC_EDIT_HIDE                   1060
+#define IDC_RADIO1                      1061
+#define IDC_RADIO2                      1062
+#define IDC_RADIO3                      1063
+#define IDC_CDATE                       1064
+#define IDC_CTITLE                      1065
+#define IDC_CCONTENT                    1066
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -74,9 +93,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_RESOURCE_VALUE        151
 #define _APS_NEXT_COMMAND_VALUE         32791
-#define _APS_NEXT_CONTROL_VALUE         1043
+#define _APS_NEXT_CONTROL_VALUE         1067
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
