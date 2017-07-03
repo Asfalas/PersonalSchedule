@@ -49,6 +49,7 @@ void CRemindDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CRemindDlg, CDialogEx)
 	ON_EN_CHANGE(IDC_RTIME, &CRemindDlg::OnEnChangeRtime)
 	ON_CBN_SELCHANGE(IDC_LATER, &CRemindDlg::OnCbnSelchangeLater)
+	ON_BN_CLICKED(IDOK, &CRemindDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -64,8 +65,6 @@ BOOL CRemindDlg::OnInitDialog()
 	m_later.AddString((LPCTSTR)_bstr_t(_T("15分钟")));
 	m_later.AddString((LPCTSTR)_bstr_t(_T("30分钟")));
 	m_later.AddString((LPCTSTR)_bstr_t(_T("1小时")));
-	
-	CalTime(m_rtime.Right(m_rtime.GetLength()- m_rtime.Find(_T(" "))),0);
 	m_later.SetCurSel(0);
 	UpdateData(FALSE);
 	return TRUE;
@@ -87,13 +86,11 @@ void CRemindDlg::OnCbnSelchangeLater()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString strWeb;
-	int nSel;
-	// 获取组合框控件的列表框中选中项的索引   
+	int nSel;   
 	nSel = m_later.GetCurSel();
-	// 根据选中项索引获取该项字符串   
-	
-	//m_later.GetLBText(nSel, strWeb);
-	
+	AfxMessageBox(m_rtime);
+	m_rtime = CalTime(m_rtime, nSel);
+	//AfxMessageBox(m_rtime);
 	AdoAccess database;       // ADOConn类对象
 	database.OnInitADOConn(); //连接数据库
 	_bstr_t sql;
@@ -115,34 +112,82 @@ void CRemindDlg::OnCbnSelchangeLater()
 		MessageBox(_T("操作失败"));
 		return;
 	}
-	UpdateData(FALSE);
-	//SetDlgItemText(IDC_COMBO1, strWeb);
+	CDialogEx::OnOK();
 }
+
 
 CString CRemindDlg::CalTime(CString time,int sel) 
 {
 	int hour, minute, second;
-	CString hourtime, minutetime, secondtime;
+	CString hourtime, minutetime, secondtime,date,timefinal;
+	date = time.Left(time.Find(_T(" ")));
+	time = time.Right(time.GetLength()- m_rtime.Find(_T(" "))-1);
 	hourtime = time.Left(time.Find(_T(":")));
-	minutetime = time.Right(time.GetLength() - time.Find(_T(":"))-1);
-	minutetime = minutetime.Left(minutetime.Find(_T(":")));
-	secondtime = time.Right(time.GetLength() - 2 - hourtime.GetLength() - minutetime.GetLength());
+	time = time.Right(time.GetLength() - hourtime.GetLength()-1);
+	minutetime = time.Left(time.Find(_T(":")));
+	secondtime = time.Right(time.GetLength()- minutetime.GetLength()-1);
 	hour = _ttoi(hourtime);
 	minute = _ttoi(minutetime);
-	second = _ttoi(secondtime);
 	switch (sel) 
 	{
 	case 0:
+		if (minute + 1 > 60)
+			hour=(++hour)%24;
+		minute = (++minute) % 60;
 		break;
 	case 1:
+		if (minute + 15 > 60)
+			hour = (++hour) % 24;
+		minute = (minute+15) % 60;
 		break;
 	case 2:
+		if (minute + 30 > 60)
+			hour = (++hour) % 24;
+		minute = (minute+30) % 60;
 		break;
 	case 3:
+		hour += 1;
 		break;
 	default:
 		break;
-
 	}
-	return CString();
+	if (hour > 9)
+		hourtime.Format(_T("%d"), hour);
+	else
+		hourtime.Format(_T("0%d", hour));
+	if (minute > 9)
+		minutetime.Format(_T("%d"), minute);
+	else
+		minutetime.Format(_T("0%d", minute));
+	timefinal = date + " " + hourtime + ":" + minutetime + ":" + secondtime;
+	return timefinal;
+}
+
+
+void CRemindDlg::OnBnClickedOk()
+{
+	AdoAccess database;
+	database.OnInitADOConn();
+	_bstr_t sql;
+	sql = "select * from latertable where l_time='" + (_bstr_t)m_rtime+ "'";
+	AfxMessageBox(sql);
+	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	try
+	{
+		if (!database.m_pRecordset->adoEOF)
+		{
+			database.m_pRecordset->Delete(adAffectCurrent);
+			database.m_pRecordset->Update();
+		}
+		database.ExitConnect();
+	}
+	catch (...)
+	{
+		MessageBox(_T("操作失败"));
+		return;
+	}
+	// TODO: 在此添加控件通知处理程序代码
+	CDialogEx::OnOK();
 }

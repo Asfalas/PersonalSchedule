@@ -56,7 +56,9 @@ public:
 	afx_msg void OnBnClickedDairy();
 	afx_msg void OnBnClickedMemo();
 	void CheckDate();
+	void CheckHoliday();
 	void CheckTime();
+	void CheckLater();
 	CString m_maindetail;
 	CListCtrl m_schedule;
 	afx_msg void OnNMClickMainlist(NMHDR *pNMHDR, LRESULT *pResult);

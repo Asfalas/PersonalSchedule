@@ -66,6 +66,9 @@
     <ClInclude Include="RemindDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="HelpDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PersonalSchedule.cpp">
@@ -110,6 +113,9 @@
     <ClCompile Include="RemindDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="HelpDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PersonalSchedule.rc">
@@ -141,6 +147,18 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\notepad-1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\bitmap6.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\error.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\hold.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\power.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

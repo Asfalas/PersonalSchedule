@@ -17,6 +17,7 @@
 #include "MemoDlg.h"
 #include "Remind.h"
 #include "RemindDlg.h"
+#include "HelpDlg.h"
 
 #pragma comment(lib, "Winmm.lib")  
 #ifdef _DEBUG
@@ -82,6 +83,7 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_COMMAND(ID_AUTOSTART, &CPersonalScheduleDlg::OnAutostart)
 	ON_COMMAND(ID_EXIT, &CPersonalScheduleDlg::OnExit)
+	ON_BN_CLICKED(IDC_BUTTON_EXIT, &CPersonalScheduleDlg::OnExit)
 	ON_COMMAND(ID_32790, &CPersonalScheduleDlg::OnExit)
 	ON_BN_CLICKED(IDC_BUTTON2, &CPersonalScheduleDlg::OnBnClickedButton2)
 	ON_COMMAND(ID_DATE, &CPersonalScheduleDlg::OnBnClickedButton2)
@@ -92,12 +94,15 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &CPersonalScheduleDlg::OnMusic)
 	ON_COMMAND(ID_MUSIC, &CPersonalScheduleDlg::OnMusic)
 	ON_COMMAND(ID_HOLIDAY, &CPersonalScheduleDlg::OnHoliday)
+	ON_BN_CLICKED(IDC_BUTTON_HOLIDAY, &CPersonalScheduleDlg::OnHoliday)
 	ON_COMMAND(ID_HELP, &CPersonalScheduleDlg::OnHelp)
+	ON_BN_CLICKED(IDC_BUTTON_HELP, &CPersonalScheduleDlg::OnHelp)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPersonalScheduleDlg::OnBnClickedButton3)
 	ON_COMMAND(ID_TIME, &CPersonalScheduleDlg::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON5, &CPersonalScheduleDlg::OnBnClickedDairy)
 	ON_COMMAND(ID_DAIRY, &CPersonalScheduleDlg::OnBnClickedDairy)
 	ON_BN_CLICKED(IDC_BUTTON6, &CPersonalScheduleDlg::OnBnClickedMemo)
+	ON_COMMAND(ID_MEMO, &CPersonalScheduleDlg::OnBnClickedMemo)
 	ON_NOTIFY(NM_CLICK, IDC_MAINLIST, &CPersonalScheduleDlg::OnNMClickMainlist)
 END_MESSAGE_MAP()
 
@@ -188,9 +193,11 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	m_schedule.GetHeaderCtrl()->EnableWindow(0);
 	//定时器设定
 	OnTimer(0);
+	OnTimer(3);
 	SetTimer(0, 60000, NULL);
 	SetTimer(1, 1000, NULL);
-	//AfxMessageBox(_T("111"));
+	SetTimer(2, 1000, NULL);
+	SetTimer(3, 60000, NULL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -205,22 +212,19 @@ void CPersonalScheduleDlg::AddtoGrid()
 	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
 	while (!m_ADOConn.m_pRecordset->adoEOF)
 	{
-		//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
-		m_schedule.InsertItem(i, _T(""));
-		//向列表视图控件中插入列
-		m_schedule.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
-		m_schedule.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
-		m_schedule.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
+		CString isremind = m_ADOConn.m_pRecordset->GetCollect("d_remind");
+		if (isremind == "FALSE")
+		{//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
+			m_schedule.InsertItem(i, _T(""));
+			//向列表视图控件中插入列
+			m_schedule.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
+			m_schedule.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
+			m_schedule.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
+			i++;
+		}
 		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
-		i++;
 	}
 	m_ADOConn.ExitConnect(); //断开数据库连接
-	CRemind remind(_T("1111"), _T("123123"), _T("2017/7/3 18:04:00"));
-	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
-	CRemindDlg rDlg(remind);           // 构造对话框类CTipDlg的实例   
-	nRes = rDlg.DoModal();  // 弹出对话框 
-	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
-		return;
 }
 
 
@@ -241,22 +245,38 @@ void CPersonalScheduleDlg::OnSysCommand(UINT nID, LPARAM lParam)
 void CPersonalScheduleDlg::InitButton() 
 {
 	//按钮初始化
-	HBITMAP   hBitmap[5];
+	HBITMAP   hBitmap[8];
 	hBitmap[0] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP2));
 	((CWnd *)GetDlgItem(IDC_BUTTON2))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON2))->SetBitmap(hBitmap[0]);
+	
 	hBitmap[1] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP1));
 	((CWnd *)GetDlgItem(IDC_BUTTON3))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON3))->SetBitmap(hBitmap[1]);
+	
 	hBitmap[2] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP3));
 	((CWnd *)GetDlgItem(IDC_BUTTON4))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON4))->SetBitmap(hBitmap[2]);
+	
 	hBitmap[3] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP4));
 	((CWnd *)GetDlgItem(IDC_BUTTON5))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON5))->SetBitmap(hBitmap[3]);
+	
 	hBitmap[4] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP5));
 	((CWnd *)GetDlgItem(IDC_BUTTON6))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON6))->SetBitmap(hBitmap[4]);
+	
+	hBitmap[5] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP8));
+	((CWnd *)GetDlgItem(IDC_BUTTON_HELP))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON_HELP))->SetBitmap(hBitmap[5]);
+	
+	hBitmap[6] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP7));
+	((CWnd *)GetDlgItem(IDC_BUTTON_EXIT))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON_EXIT))->SetBitmap(hBitmap[6]);
+	
+	hBitmap[7] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP9));
+	((CWnd *)GetDlgItem(IDC_BUTTON_HOLIDAY))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
+	((CButton *)GetDlgItem(IDC_BUTTON_HOLIDAY))->SetBitmap(hBitmap[7]);
 }
 
 
@@ -271,9 +291,15 @@ CString CPersonalScheduleDlg::InitTime()
 	CString hourTime;
 	CString minuteTime;
 	CString secondTime;
-	hourTime.Format(_T("%d"), hour);
-	minuteTime.Format(_T("%d"), minute);
-	secondTime.Format(_T("%d"), second);
+	if(hour>9)
+		hourTime.Format(_T("%d"), hour);
+	else hourTime.Format(_T("0%d"), hour);
+	if (minute>9)
+		minuteTime.Format(_T("%d"), minute);
+	else minuteTime.Format(_T("0%d"), minute);
+	if (second>9)
+		secondTime.Format(_T("%d"), second);
+	else secondTime.Format(_T("0%d"), second);
 	sys_timeFinal.Format(_T("%s:%s:%s"), hourTime, minuteTime, secondTime);
 	return sys_timeFinal;
 }
@@ -491,8 +517,6 @@ LRESULT CPersonalScheduleDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lPa
 }
 
 
-
-
 void CPersonalScheduleDlg::OnMinimize()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -519,12 +543,16 @@ void CPersonalScheduleDlg::OnMusic()
 }
 
 
+
 void CPersonalScheduleDlg::OnHoliday()
 {
+	KillTimer(3);
 	// TODO: 在此添加命令处理程序代码
 	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
 	CFestivalDlg hDlg;           // 构造对话框类CTipDlg的实例   
-	nRes = hDlg.DoModal();  // 弹出对话框   
+	nRes = hDlg.DoModal();  // 弹出对话框
+	OnTimer(3);
+	SetTimer(3, 6000, NULL);
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
 }
@@ -533,8 +561,12 @@ void CPersonalScheduleDlg::OnHoliday()
 void CPersonalScheduleDlg::OnHelp()
 {
 	// TODO: 在此添加命令处理程序代码
-
-	MessageBox(_T("个人日程管理系统 1.0 版\r\n         版权所有 (C)2017\r\n              -zhang"), _T("系统信息"), NULL);
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	CHelpDlg hDlg;           // 构造对话框类CTipDlg的实例   
+	nRes = hDlg.DoModal();  // 弹出对话框 
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;
+	//MessageBox(_T("个人日程管理系统 1.0 版\r\n         版权所有 (C)2017\r\n              -zhang"), _T("系统信息"), NULL);
 }
 
 //定时提醒
@@ -577,12 +609,11 @@ void CPersonalScheduleDlg::CheckDate()
 {
 	CString sys_dateFinal, path, name, vol;
 	sys_dateFinal = InitDate();
-	//AfxMessageBox(_T("test"));
-	AdoAccess data;				 // ADOConn类对象
-	data.OnInitADOConn();		 //连接数据库
+	AdoAccess data;				        // ADOConn类对象
+	data.OnInitADOConn();		        //连接数据库
 	CString date, title, content, isRemind;
 	_bstr_t sql;
-	sql = "select * from datetable";                         //设置查询语句
+	sql = "select * from datetable";    //设置查询语句
 	data.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -602,10 +633,56 @@ void CPersonalScheduleDlg::CheckDate()
 				flag = true;
 			}
 			KillTimer(0);
-			MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("日程提醒"), MB_ICONQUESTION);
+			//MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("日程提醒"), MB_ICONQUESTION);
+			CRemind remind(title, content, date+" "+InitTime());
+			CRemindDlg rDlg(remind);
+			rDlg.DoModal();
 			data.m_pRecordset->PutCollect("d_remind", (_bstr_t)"TRUE");
 			data.m_pRecordset->Update();
 			SetTimer(0, 60000, NULL);
+		}
+		data.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+	}
+	stop(myDevice);
+	data.ExitConnect(); //断开数据库连接
+}
+
+
+void CPersonalScheduleDlg::CheckHoliday()
+{
+	CString sys_dateFinal, path, name, vol;
+	sys_dateFinal = InitDate();
+	AdoAccess data;				        // ADOConn类对象
+	data.OnInitADOConn();		        //连接数据库
+	CString date, title, content, isRemind;
+	_bstr_t sql;
+	sql = "select * from holidaytable";    //设置查询语句
+	data.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	BOOL flag = false;
+	DWORD myDevice = NULL;
+	while (!data.m_pRecordset->adoEOF)
+	{
+		date = data.m_pRecordset->GetCollect("h_date");
+		title = data.m_pRecordset->GetCollect("h_title");
+		content = data.m_pRecordset->GetCollect("h_content");
+		isRemind = data.m_pRecordset->GetCollect("h_remind");
+		if (sys_dateFinal.Right(sys_dateFinal.GetLength() - sys_dateFinal.Find(_T("/")) - 1) == date.Right(date.GetLength() - date.Find(_T("/")) - 1) &&isRemind == _T("FALSE"))
+		{
+			if (!flag)
+			{
+				myDevice = play();
+				flag = true;
+			}
+			KillTimer(3);
+			//MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("日程提醒"), MB_ICONQUESTION);
+			CRemind remind(title, content, date + " " + InitTime());
+			CRemindDlg rDlg(remind);
+			rDlg.DoModal();
+			data.m_pRecordset->PutCollect("h_remind", (_bstr_t)"TRUE");
+			data.m_pRecordset->Update();
+			SetTimer(3, 60000, NULL);
 		}
 		data.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
 	}
@@ -654,7 +731,9 @@ void CPersonalScheduleDlg::CheckTime()
 						flag = true;
 					}
 					KillTimer(1);
-					MessageBox(time + _T("定时提醒:\r\n标题：" + title + "\r\n内容：" + content), _T("日程提醒"), MB_ICONQUESTION);
+					CRemind remind(title, content, time);
+					CRemindDlg rDlg(remind);
+					rDlg.DoModal();
 					data.m_pRecordset->PutCollect("d_remind", (_bstr_t)"TRUE");
 					data.m_pRecordset->Update();
 					SetTimer(1, 1000, NULL);
@@ -668,11 +747,55 @@ void CPersonalScheduleDlg::CheckTime()
 					flag = true;
 				}
 				KillTimer(1);
-				MessageBox(time.Mid(time.Find(_T(" ")) + 1) + _T("定时提醒:\r\n标题：" + title + "\r\n内容：" + content), _T("日程提醒"), MB_ICONQUESTION);
+				CRemind remind(title, content, time);
+				CRemindDlg rDlg(remind);
+				rDlg.DoModal();
 				data.m_pRecordset->PutCollect("d_remind", (_bstr_t)"TRUE");
 				data.m_pRecordset->Update();
 				SetTimer(1, 1000, NULL);
 			}
+		}
+		data.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+	}
+	stop(myDevice);
+	data.ExitConnect(); //断开数据库连接
+}
+
+
+void CPersonalScheduleDlg::CheckLater()
+{
+	CString sys_timeFinal;
+	sys_timeFinal = InitTime();
+	COleDateTime s_time;
+	s_time = COleDateTime::GetCurrentTime();
+	AdoAccess data;				 // ADOConn类对象
+	data.OnInitADOConn();		 //连接数据库
+	CString time, title, content, isRemind, type;
+	_bstr_t sql;
+	sql = "select * from latertable";				//设置查询语句
+	data.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	BOOL flag = false;
+	DWORD myDevice = NULL;
+	while (!data.m_pRecordset->adoEOF)
+	{
+		time = data.m_pRecordset->GetCollect("l_time");
+		title = data.m_pRecordset->GetCollect("l_title");
+		content = data.m_pRecordset->GetCollect("l_content");
+		if (time.Mid(time.Find(_T(" ")) + 1) == sys_timeFinal)
+		{
+			if (!flag)
+			{
+				myDevice = play();
+				flag = true;
+			}
+			KillTimer(2);
+			CRemind remind(title, content, time);
+			CRemindDlg rDlg(remind);
+			rDlg.DoModal();
+			data.m_pRecordset->Update();
+			SetTimer(2, 1000, NULL);
 		}
 		data.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
 	}
@@ -690,6 +813,12 @@ void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 		break;
 	case 1:
 		CheckTime();
+		break;
+	case 2:
+		CheckLater();
+		break;
+	case 3:
+		CheckHoliday();
 		break;
 	default:
 		break;

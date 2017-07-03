@@ -191,6 +191,7 @@
     <ClInclude Include="DairyDlg.h" />
     <ClInclude Include="DateDLG.h" />
     <ClInclude Include="FestivalDlg.h" />
+    <ClInclude Include="HelpDlg.h" />
     <ClInclude Include="MemoDlg.h" />
     <ClInclude Include="MusicDlg.h" />
     <ClInclude Include="PersonalSchedule.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="DairyDlg.cpp" />
     <ClCompile Include="DateDLG.cpp" />
     <ClCompile Include="FestivalDlg.cpp" />
+    <ClCompile Include="HelpDlg.cpp" />
     <ClCompile Include="MemoDlg.cpp" />
     <ClCompile Include="MusicDlg.cpp" />
     <ClCompile Include="PersonalSchedule.cpp" />
@@ -233,11 +235,15 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\alarm-clock.bmp" />
+    <Image Include="res\bitmap6.bmp" />
     <Image Include="res\calendar.bmp" />
+    <Image Include="res\error.bmp" />
+    <Image Include="res\hold.bmp" />
     <Image Include="res\music-player-2.bmp" />
     <Image Include="res\notebook-1.bmp" />
     <Image Include="res\notepad-1.bmp" />
     <Image Include="res\PersonalSchedule.ico" />
+    <Image Include="res\power.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

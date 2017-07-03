@@ -33,4 +33,5 @@ public:
 	void OnEnChangeRtime();
 	afx_msg void OnCbnSelchangeLater();
 	CString CalTime(CString time, int sel);
+	afx_msg void OnBnClickedOk();
 };

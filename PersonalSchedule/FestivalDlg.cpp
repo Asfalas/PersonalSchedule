@@ -123,6 +123,7 @@ void CFestivalDlg::OnBnClickedHnew()
 		database.m_pRecordset->PutCollect("h_title", (_bstr_t)m_htitle);
 		database.m_pRecordset->PutCollect("h_content", (_bstr_t)m_hcontent);
 		database.m_pRecordset->PutCollect("h_type", (_bstr_t)"用户节日");
+		database.m_pRecordset->PutCollect("h_remind", (_bstr_t)"FALSE");
 		database.m_pRecordset->Update();
 		database.ExitConnect();
 	}
@@ -268,6 +269,7 @@ void CFestivalDlg::OnBnClickedHchange()
 		data.m_pRecordset->PutCollect("h_date", (_bstr_t)timeFinal);
 		data.m_pRecordset->PutCollect("h_title", (_bstr_t)m_htitle);
 		data.m_pRecordset->PutCollect("h_content", (_bstr_t)m_hcontent);
+		data.m_pRecordset->PutCollect("h_remind", (_bstr_t)"FALSE");
 		data.m_pRecordset->Update();
 		data.ExitConnect();
 	}
