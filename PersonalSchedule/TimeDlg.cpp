@@ -92,23 +92,23 @@ void CTimeDlg::AddtoGrid()
 	m_ADOConn.OnInitADOConn(); //连接数据库
 	CString sql;
 	int i = 0;
-	sql = "select * from timetable order by t_time asc";                         //设置查询语句
+	sql = "select * from datetable where d_type<>'定期提醒' order by d_date asc";                         //设置查询语句
 	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
 	while (!m_ADOConn.m_pRecordset->adoEOF)
 	{
 		//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
 		m_tlist.InsertItem(i, _T(""));
 		//向列表视图控件中插入列
-		CString time = m_ADOConn.m_pRecordset->GetCollect("t_time");
-		int weekday = m_ADOConn.m_pRecordset->GetCollect("t_weekday");
+		CString time = m_ADOConn.m_pRecordset->GetCollect("d_date");
+		int weekday = m_ADOConn.m_pRecordset->GetCollect("d_weekday");
 		time = time.Mid(time.Find(_T(" ")) + 1);
-		CString type = m_ADOConn.m_pRecordset->GetCollect("t_type");
+		CString type = m_ADOConn.m_pRecordset->GetCollect("d_type");
 		if (type == _T("每周提醒"))
 			time = week[weekday + 1] + time;
 		m_tlist.SetItemText(i, 0, (LPCTSTR)_bstr_t(time));
-		m_tlist.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("t_title")));
+		m_tlist.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
 		m_tlist.SetItemText(i, 2, (LPCTSTR)_bstr_t(type));
-		m_tlist.SetItemText(i, 3, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("t_content")));
+		m_tlist.SetItemText(i, 3, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
 		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
 		i++;
 	}
@@ -164,7 +164,7 @@ void CTimeDlg::OnBnClickedTdel()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from timetable order by t_time asc";
+	sql = "select * from datetable where d_type<>'定期提醒' order by d_date asc";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -218,52 +218,52 @@ void CTimeDlg::OnNMDblclkTlist(NMHDR *pNMHDR, LRESULT *pResult)
 void CTimeDlg::OnEnKillfocusEditHide()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CString tem;
-	m_hide.GetWindowText(tem);    //得到用户输入的新的内容  
-	m_tlist.SetItemText(m_Row, m_Col, tem);   //设置编辑框的新内容  
-	CString m_time,m_title,m_type;
+	//CString tem;
+	//m_hide.GetWindowText(tem);    //得到用户输入的新的内容  
+	//m_tlist.SetItemText(m_Row, m_Col, tem);   //设置编辑框的新内容  
+	//CString m_time,m_title,m_type;
 
-	m_time = m_tlist.GetItemText(m_Row, 0);
-	m_title= m_tlist.GetItemText(m_Row, 1);
-	m_type = m_tlist.GetItemText(m_Row, 2);
+	//m_time = m_tlist.GetItemText(m_Row, 0);
+	//m_title= m_tlist.GetItemText(m_Row, 1);
+	//m_type = m_tlist.GetItemText(m_Row, 2);
 
-	AdoAccess data;
-	if (m_title.IsEmpty() || m_type.IsEmpty()||m_type.IsEmpty())
-	{
-		MessageBox(_T("基础信息不能为空！"));
-		m_tlist.SetItemText(m_Row, m_Col, m_str);
-		m_hide.ShowWindow(SW_HIDE);
-		return;
-	}
+	//AdoAccess data;
+	//if (m_title.IsEmpty() || m_type.IsEmpty()||m_type.IsEmpty())
+	//{
+	//	MessageBox(_T("基础信息不能为空！"));
+	//	m_tlist.SetItemText(m_Row, m_Col, m_str);
+	//	m_hide.ShowWindow(SW_HIDE);
+	//	return;
+	//}
 
-	data.OnInitADOConn();
-	_bstr_t sql;
-	sql = "select * from timetable order by t_time asc";
-	data.m_pRecordset.CreateInstance(__uuidof(Recordset));
-	data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
-		adLockOptimistic, adCmdText);
-	try
-	{
-		data.m_pRecordset->Move((long)pos, vtMissing);
-		data.m_pRecordset->PutCollect("t_time", (_bstr_t)m_time);
-		data.m_pRecordset->PutCollect("t_title", (_bstr_t)m_title);
-		data.m_pRecordset->PutCollect("t_type", (_bstr_t)m_type);
-		data.m_pRecordset->Update();
-		data.ExitConnect();
-	}
-	catch (_com_error &e)
-	{
-		AfxMessageBox(_T("链接失败"));
-		CString str;
-		str.Format(_T("%s    %s"), (LPCTSTR)e.Description(), \
-			(LPCTSTR)e.ErrorMessage());
-		AfxMessageBox(str);
-		data.ExitConnect();
-	}
-	MessageBox(_T("修改成功"));
-	m_tlist.DeleteAllItems();
-	AddtoGrid();
-	m_hide.ShowWindow(SW_HIDE);                //应藏编辑框  
+	//data.OnInitADOConn();
+	//_bstr_t sql;
+	//sql = "select * from datetable where d_type<>'定期提醒' order by d_date asc";
+	//data.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	//data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+	//	adLockOptimistic, adCmdText);
+	//try
+	//{
+	//	data.m_pRecordset->Move((long)pos, vtMissing);
+	//	data.m_pRecordset->PutCollect("d_date", (_bstr_t)m_time);
+	//	data.m_pRecordset->PutCollect("d_title", (_bstr_t)m_title);
+	//	data.m_pRecordset->PutCollect("d_type", (_bstr_t)m_type);
+	//	data.m_pRecordset->Update();
+	//	data.ExitConnect();
+	//}
+	//catch (_com_error &e)
+	//{
+	//	AfxMessageBox(_T("链接失败"));
+	//	CString str;
+	//	str.Format(_T("%s    %s"), (LPCTSTR)e.Description(), \
+	//		(LPCTSTR)e.ErrorMessage());
+	//	AfxMessageBox(str);
+	//	data.ExitConnect();
+	//}
+	//MessageBox(_T("修改成功"));
+	//m_tlist.DeleteAllItems();
+	//AddtoGrid();
+	//m_hide.ShowWindow(SW_HIDE);                //应藏编辑框  
 }
 
 

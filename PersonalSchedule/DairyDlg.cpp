@@ -49,7 +49,6 @@ BOOL CDairyDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	CString date;
 	date = InitTime();
-	AfxMessageBox(date);
 	AddtoGrid(date);
 	return TRUE;  // return TRUE  unless you set the focus to a control   
 }

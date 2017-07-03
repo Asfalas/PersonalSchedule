@@ -97,18 +97,19 @@ void CTimepopDlg::OnBnClickedOk()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from timetable";
+	sql = "select * from datetable";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
 	try
 	{
 		database.m_pRecordset->AddNew(); //Ìí¼ÓÐÂÐÐ
-		database.m_pRecordset->PutCollect("t_time", (_bstr_t)timeFinal);
-		database.m_pRecordset->PutCollect("t_title", (_bstr_t)m_ttitle);
-		database.m_pRecordset->PutCollect("t_content", (_bstr_t)m_tcontent);
-		database.m_pRecordset->PutCollect("t_type", (_bstr_t)m_type);
-		database.m_pRecordset->PutCollect("t_weekday", (_bstr_t)weekday);
+		database.m_pRecordset->PutCollect("d_date", (_bstr_t)timeFinal);
+		database.m_pRecordset->PutCollect("d_title", (_bstr_t)m_ttitle);
+		database.m_pRecordset->PutCollect("d_content", (_bstr_t)m_tcontent);
+		database.m_pRecordset->PutCollect("d_type", (_bstr_t)m_type);
+		database.m_pRecordset->PutCollect("d_weekday", (_bstr_t)weekday);
+		database.m_pRecordset->PutCollect("d_remind", (_bstr_t)"FALSE");
 		database.m_pRecordset->Update();
 		database.ExitConnect();
 	}

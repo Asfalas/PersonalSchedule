@@ -31,8 +31,9 @@ protected:
 	void AddtoGrid();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	void InitButton();
-	CString Init_time;
+	CString Init_time,Init_date;
 	CString  InitTime();
+	CString  InitDate();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OnSystemtray(WPARAM wParam, LPARAM lParam);
@@ -53,6 +54,8 @@ public:
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedDairy();
 	afx_msg void OnBnClickedMemo();
+	void CheckDate();
+	void CheckTime();
 	CString m_maindetail;
 	CListCtrl m_schedule;
 };

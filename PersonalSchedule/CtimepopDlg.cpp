@@ -69,15 +69,15 @@ BOOL CCtimepopDlg::OnInitDialog()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from timetable order by t_time asc";
+	sql = "select * from datetable where d_type<>'定期提醒' order by d_date asc";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
 	try
 	{
 		database.m_pRecordset->Move(pos, vtMissing);
-		m_ctitle=database.m_pRecordset->GetCollect("t_title");
-		m_ccontent = database.m_pRecordset->GetCollect("t_content");
+		m_ctitle=database.m_pRecordset->GetCollect("d_title");
+		m_ccontent = database.m_pRecordset->GetCollect("d_content");
 		database.ExitConnect();
 	}
 	catch (...)
@@ -137,18 +137,19 @@ void CCtimepopDlg::OnBnClickedOk()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from timetable";
+	sql = "select * from datetable where d_type<>'定期提醒' order by d_date asc";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
 	try
 	{
 		database.m_pRecordset->Move(pos, vtMissing);
-		database.m_pRecordset->PutCollect("t_time", (_bstr_t)timeFinal);
-		database.m_pRecordset->PutCollect("t_title", (_bstr_t)m_ctitle);
-		database.m_pRecordset->PutCollect("t_content", (_bstr_t)m_ccontent);
-		database.m_pRecordset->PutCollect("t_type", (_bstr_t)m_type);
-		database.m_pRecordset->PutCollect("t_weekday", (_bstr_t)weekday);
+		database.m_pRecordset->PutCollect("d_date", (_bstr_t)timeFinal);
+		database.m_pRecordset->PutCollect("d_title", (_bstr_t)m_ctitle);
+		database.m_pRecordset->PutCollect("d_content", (_bstr_t)m_ccontent);
+		database.m_pRecordset->PutCollect("d_type", (_bstr_t)m_type);
+		database.m_pRecordset->PutCollect("d_weekday", (_bstr_t)weekday);
+		database.m_pRecordset->PutCollect("d_remind", (_bstr_t)"FALSE");
 		database.m_pRecordset->Update();
 		database.ExitConnect();
 	}

@@ -90,7 +90,7 @@ void CDateDLG::OnBnClickedNew()
 	}
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from datetable order by d_date asc";
+	sql = "select * from datetable";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -100,6 +100,8 @@ void CDateDLG::OnBnClickedNew()
 		database.m_pRecordset->PutCollect("d_date", (_bstr_t)timeFinal);
 		database.m_pRecordset->PutCollect("d_title", (_bstr_t)m_title);
 		database.m_pRecordset->PutCollect("d_content", (_bstr_t)m_content);
+		database.m_pRecordset->PutCollect("d_remind", (_bstr_t)"FALSE");
+		database.m_pRecordset->PutCollect("d_type", (_bstr_t)"定期提醒");
 		database.m_pRecordset->Update();
 		database.ExitConnect();
 	}
@@ -124,7 +126,7 @@ void CDateDLG::AddtoGrid()
 	m_ADOConn.OnInitADOConn(); //连接数据库
 	CString sql;
 	int i = 0;
-	sql.Format(_T("select * from datetable order by d_date asc"));                         //设置查询语句
+	sql.Format(_T("select * from datetable where d_type='定期提醒' order by d_date asc"));                         //设置查询语句
 	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
 	while (!m_ADOConn.m_pRecordset->adoEOF)
 	{
@@ -146,7 +148,7 @@ void CDateDLG::OnBnClickedDel()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from datetable order by d_date asc";
+	sql = "select * from datetable where d_type='定期提醒' order by d_date asc";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -213,7 +215,7 @@ void CDateDLG::OnBnClickedChange()
 
 	data.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from datetable order by d_date asc";
+	sql = "select * from datetable where d_type='定期提醒' order by d_date asc";
 	data.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	data.m_pRecordset->Open(sql, data.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -223,6 +225,7 @@ void CDateDLG::OnBnClickedChange()
 		data.m_pRecordset->PutCollect("d_date", (_bstr_t)timeFinal);
 		data.m_pRecordset->PutCollect("d_title", (_bstr_t)m_title);
 		data.m_pRecordset->PutCollect("d_content", (_bstr_t)m_content);
+		data.m_pRecordset->PutCollect("d_remind", (_bstr_t)"FALSE");
 		data.m_pRecordset->Update();
 		data.ExitConnect();
 	}
@@ -246,7 +249,7 @@ void CDateDLG::OnBnClickedClear()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from datetable";
+	sql = "select * from datetable where d_type='定期提醒'";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
