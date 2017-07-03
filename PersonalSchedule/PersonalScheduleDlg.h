@@ -34,6 +34,7 @@ protected:
 	CString Init_time,Init_date;
 	CString  InitTime();
 	CString  InitDate();
+	int pos;
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OnSystemtray(WPARAM wParam, LPARAM lParam);
@@ -58,4 +59,5 @@ public:
 	void CheckTime();
 	CString m_maindetail;
 	CListCtrl m_schedule;
+	afx_msg void OnNMClickMainlist(NMHDR *pNMHDR, LRESULT *pResult);
 };

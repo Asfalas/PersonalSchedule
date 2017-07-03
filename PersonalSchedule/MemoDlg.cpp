@@ -267,6 +267,7 @@ void CMemoDlg::OnCbnSelchangeMtitle()
 	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
 	m_ADOConn.m_pRecordset->Move(pos, vtMissing);
 	m_mcontent = m_ADOConn.m_pRecordset->GetCollect("m_content");
+	m_mcurrent = m_ADOConn.m_pRecordset->GetCollect("m_title");
 	m_ADOConn.ExitConnect(); //断开数据库连接
 	UpdateData(FALSE);
 }

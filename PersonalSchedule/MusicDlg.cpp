@@ -13,7 +13,7 @@
 HWND m_hWnd;
 DWORD DeviceId;
 MCI_OPEN_PARMS mciopenparms;
-
+CString thisPath1;
 
 // CMusicDlg 对话框
 
@@ -54,7 +54,10 @@ BOOL CMusicDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 	m_slider.SetScrollRange(1, 100);
 	// 设置水平滚动条的初始位置为20   
-
+	TCHAR szModule[_MAX_PATH];
+	GetModuleFileName(NULL, szModule, _MAX_PATH);//得到本程序自身的全路径
+	thisPath1 = szModule;
+	thisPath1 = thisPath1.Left(thisPath1.GetLength() - 20);
 	if (!InitMusic())
 	{
 		GetDlgItem(IDC_play)->EnableWindow(false); //文件没有读取时所有按钮不可选
@@ -73,18 +76,18 @@ BOOL CMusicDlg::OnInitDialog()
 
 BOOL CMusicDlg::InitMusic() {
 	CFileFind finder;   //查找是否存在ini文件，若不存在，则生成一个新的默认设置的ini文件，这样就保证了我们更改后的设置每次都可用
-	BOOL ifFind = finder.FindFile(_T("./music.ini"));
+	BOOL ifFind = finder.FindFile(thisPath1 + _T("music.ini"));
 	if (!ifFind) {
-		::WritePrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), _T("./music.ini"));
-		::WritePrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), _T("./music.ini"));
-		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), _T("20"), _T("./music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), thisPath1 + _T("music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), thisPath1 + _T("music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), _T("20"), thisPath1 + _T("music.ini"));
 		return false;
 	}
 	else
 	{
-		GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), m_path.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
-		GetPrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), m_name.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
-		GetPrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), m_vol.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
+		GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), m_path.GetBuffer(MAX_PATH), MAX_PATH, thisPath1 + _T("music.ini"));
+		GetPrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), m_name.GetBuffer(MAX_PATH), MAX_PATH, thisPath1 + _T("music.ini"));
+		GetPrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), m_vol.GetBuffer(MAX_PATH), MAX_PATH, thisPath1 + _T("music.ini"));
 		if ((m_path=="")|| (m_name == "") || (m_vol == ""))
 			return false;
 	}
@@ -164,8 +167,8 @@ void CMusicDlg::OnBnClickedfilechoice()
 	{
 		CString strFilepath = dlg.GetPathName();
 		CString strFilename = dlg.GetFileName();
-		::WritePrivateProfileString(_T("Music Info"), _T("m_path"), strFilepath, _T("./music.ini"));
-		::WritePrivateProfileString(_T("Music Info"), _T("m_name"), strFilename, _T("./music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_path"), strFilepath, thisPath1 + _T("music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_name"), strFilename, thisPath1 + _T("music.ini"));
 		SetDlgItemText(IDC_filename, strFilename);
 		m_path = strFilepath;
 		m_name = strFilename;
@@ -270,7 +273,7 @@ void CMusicDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		setvolume(pos); 
 		CString p;
 		p.Format(_T("%d"), pos);
-		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"),p, _T("./music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"),p, thisPath1 + _T("music.ini"));
 		SetDlgItemInt(IDC_vol, pos);
 		return;
 	}
@@ -278,7 +281,7 @@ void CMusicDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	// 设置滚动块位置  
 	CString p;
 	p.Format(_T("%d"), pos);
-	::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), p, _T("./music.ini"));
+	::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), p, thisPath1 + _T("music.ini"));
 	m_slider.SetScrollPos(pos);
 	setvolume(pos);
 

@@ -15,6 +15,8 @@
 #include "TimeDlg.h"
 #include "DairyDlg.h"
 #include "MemoDlg.h"
+#include "Remind.h"
+#include "RemindDlg.h"
 
 #pragma comment(lib, "Winmm.lib")  
 #ifdef _DEBUG
@@ -24,6 +26,7 @@ DWORD play();
 void stop(DWORD DeviceId);
 //BOOL isAutoStart = FALSE;
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
+CString thisPath;
 
 class CAboutDlg : public CDialogEx
 {
@@ -95,6 +98,7 @@ BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON5, &CPersonalScheduleDlg::OnBnClickedDairy)
 	ON_COMMAND(ID_DAIRY, &CPersonalScheduleDlg::OnBnClickedDairy)
 	ON_BN_CLICKED(IDC_BUTTON6, &CPersonalScheduleDlg::OnBnClickedMemo)
+	ON_NOTIFY(NM_CLICK, IDC_MAINLIST, &CPersonalScheduleDlg::OnNMClickMainlist)
 END_MESSAGE_MAP()
 
 
@@ -103,7 +107,10 @@ END_MESSAGE_MAP()
 BOOL CPersonalScheduleDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	TCHAR szModule[_MAX_PATH];
+	GetModuleFileName(NULL, szModule, _MAX_PATH);//得到本程序自身的全路径
+	thisPath = szModule;
+	thisPath = thisPath.Left(thisPath.GetLength() - 20);
 	// 将“关于...”菜单项添加到系统菜单中。
 
 	// IDM_ABOUTBOX 必须在系统命令范围内。
@@ -135,17 +142,17 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 
 	//开机自启动文件初始化
 	CFileFind finder;   //查找是否存在ini文件，若不存在，则生成一个新的默认设置的ini文件，这样就保证了我们更改后的设置每次都可用
-	BOOL ifFind = finder.FindFile(_T("./autorun.ini"));
+	BOOL ifFind = finder.FindFile(thisPath + _T("autorun.ini"));
 	if (!ifFind)
 	{
-		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("FALSE"), _T("./autorun.ini"));
+		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("FALSE"), thisPath + _T("autorun.ini"));
 		CMenu* menu = GetMenu()->GetSubMenu(0);
 		menu->CheckMenuItem(ID_AUTOSTART, MF_UNCHECKED);
 	}
 	else
 	{
 		CString isAutorun;
-		GetPrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T(""), isAutorun.GetBuffer(MAX_PATH), MAX_PATH, _T("./autorun.ini"));
+		GetPrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T(""), isAutorun.GetBuffer(MAX_PATH), MAX_PATH, thisPath + _T("autorun.ini"));
 		if (isAutorun == "FALSE")
 		{
 			CMenu* menu = GetMenu()->GetSubMenu(0);
@@ -157,9 +164,6 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 			menu->CheckMenuItem(ID_AUTOSTART, MF_CHECKED);
 		}
 	}
-	ifFind = finder.FindFile(_T("./flag.ini"));
-	if(!ifFind)
-		::WritePrivateProfileString(_T("Database Update Info"), _T("isUpdate"), _T("FALSE"), _T("./flag.ini"));
 	//系统托盘实现
 	NotifyIcon.cbSize = sizeof(NOTIFYICONDATA);
 	//NotifyIcon.hIcon=AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -181,6 +185,7 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	m_schedule.InsertColumn(1, _T("日程标题"), LVCFMT_CENTER, rect.Width() / 3, 1);
 	m_schedule.InsertColumn(2, _T("日程内容"), LVCFMT_CENTER, rect.Width() / 3, 2);
 	AddtoGrid();
+	m_schedule.GetHeaderCtrl()->EnableWindow(0);
 	//定时器设定
 	OnTimer(0);
 	SetTimer(0, 60000, NULL);
@@ -210,6 +215,12 @@ void CPersonalScheduleDlg::AddtoGrid()
 		i++;
 	}
 	m_ADOConn.ExitConnect(); //断开数据库连接
+	CRemind remind(_T("1111"), _T("123123"), _T("2017/7/3 18:04:00"));
+	INT_PTR nRes;             // 用于保存DoModal函数的返回值   
+	CRemindDlg rDlg(remind);           // 构造对话框类CTipDlg的实例   
+	nRes = rDlg.DoModal();  // 弹出对话框 
+	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
+		return;
 }
 
 
@@ -366,7 +377,7 @@ void CPersonalScheduleDlg::SetAutoRun(BOOL bAutoRun)
 			TCHAR szModule[_MAX_PATH];
 			GetModuleFileName(NULL, szModule, _MAX_PATH);//得到本程序自身的全路径
 			CString a = szModule;
-			RegSetValueEx(hKey, _T("PersonalSchedule"), 0, REG_SZ, (const BYTE*)(LPCSTR)szModule, a.GetLength()); //添加一个子Key,并设置值，"Client"是应用程序名字（不加后缀.exe）  
+			RegSetValueEx(hKey, _T("PersonalSchedule"), 0, REG_SZ, (const BYTE*)(LPCSTR)szModule, _MAX_PATH); //添加一个子Key,并设置值，"Client"是应用程序名字（不加后缀.exe）  
 			RegCloseKey(hKey); //关闭注册表  
 		}
 		else
@@ -389,20 +400,20 @@ void CPersonalScheduleDlg::SetAutoRun(BOOL bAutoRun)
 void CPersonalScheduleDlg::OnAutostart()
 {
 	CString isAutorun;
-	GetPrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T(""), isAutorun.GetBuffer(MAX_PATH), MAX_PATH, _T("./autorun.ini"));
+	GetPrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T(""), isAutorun.GetBuffer(MAX_PATH), MAX_PATH, thisPath + _T("autorun.ini"));
 	if (isAutorun == "FALSE") 
 	{
 		SetAutoRun(TRUE);
 		CMenu* menu = GetMenu()->GetSubMenu(0);
 		menu->CheckMenuItem(ID_AUTOSTART, MF_CHECKED);
-		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("TRUE"), _T("./autorun.ini"));
+		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("TRUE"), thisPath + _T("autorun.ini"));
 	}
 	else 
 	{
 		SetAutoRun(FALSE);
 		CMenu* menu = GetMenu()->GetSubMenu(0);
 		menu->CheckMenuItem(ID_AUTOSTART, MF_UNCHECKED);
-		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("FALSE"), _T("./autorun.ini"));
+		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("FALSE"), thisPath + _T("autorun.ini"));
 	}
 }
 
@@ -669,6 +680,7 @@ void CPersonalScheduleDlg::CheckTime()
 	data.ExitConnect(); //断开数据库连接
 }
 
+
 void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	switch (nIDEvent)
@@ -685,11 +697,12 @@ void CPersonalScheduleDlg::OnTimer(UINT_PTR nIDEvent)
 	return;
 }
 
+
 DWORD play()
 {
 	CString path, vol;
-	GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), path.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
-	GetPrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), vol.GetBuffer(MAX_PATH), MAX_PATH, _T("./music.ini"));
+	GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), path.GetBuffer(MAX_PATH), MAX_PATH, thisPath + _T("music.ini"));
+	GetPrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), vol.GetBuffer(MAX_PATH), MAX_PATH, thisPath + _T("music.ini"));
 	MCI_OPEN_PARMS openParms;//MCI_OPEN命令需要参数结构体  
 	openParms.lpstrDeviceType = _T("MPEGvideo");//MP3的文件设备ID为MPEGvideo  
 	openParms.lpstrElementName = path;//MP3文件的存放路径  
@@ -717,8 +730,25 @@ DWORD play()
 	return m_wDeviceID;
 }
 
+
 void stop(DWORD DeviceId)
 {
 	mciSendCommand(DeviceId, MCI_STOP, 0, 0);
 	mciSendCommand(DeviceId, MCI_CLOSE, 0, 0);
+}
+
+
+void CPersonalScheduleDlg::OnNMClickMainlist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	int nItem = -1;
+	LPNMITEMACTIVATE lpNMItemActivate = (LPNMITEMACTIVATE)pNMHDR;
+	if (lpNMItemActivate != NULL)
+	{
+		nItem = lpNMItemActivate->iItem;
+	}
+	pos = m_schedule.GetSelectionMark();
+	m_maindetail = _T("标题：") + m_schedule.GetItemText(nItem, 1) + "\r\n" + _T("内容：") + m_schedule.GetItemText(nItem, 2);
+	UpdateData(FALSE);
 }

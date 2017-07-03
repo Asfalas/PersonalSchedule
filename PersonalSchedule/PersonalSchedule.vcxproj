@@ -195,6 +195,8 @@
     <ClInclude Include="MusicDlg.h" />
     <ClInclude Include="PersonalSchedule.h" />
     <ClInclude Include="PersonalScheduleDlg.h" />
+    <ClInclude Include="Remind.h" />
+    <ClInclude Include="RemindDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -211,6 +213,8 @@
     <ClCompile Include="MusicDlg.cpp" />
     <ClCompile Include="PersonalSchedule.cpp" />
     <ClCompile Include="PersonalScheduleDlg.cpp" />
+    <ClCompile Include="Remind.cpp" />
+    <ClCompile Include="RemindDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

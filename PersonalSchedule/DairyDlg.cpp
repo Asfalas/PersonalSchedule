@@ -54,29 +54,6 @@ BOOL CDairyDlg::OnInitDialog()
 }
 
 
-//void CDairyDlg::OnCbnSelchangeCombo1()
-//{
-//	// TODO: 在此添加控件通知处理程序代码
-//	CString strWeb;
-//	int nSel;
-//	// 获取组合框控件的列表框中选中项的索引   
-//	nSel = m_dtitle.GetCurSel();
-//	pos = nSel;
-//	// 根据选中项索引获取该项字符串   
-//	m_dtitle.GetLBText(nSel, strWeb);
-//	AdoAccess m_ADOConn;       // ADOConn类对象
-//	m_ADOConn.OnInitADOConn(); //连接数据库
-//	CString sql;
-//	sql.Format(_T("select * from dairytable where d_date='" + my_date + "'"));                         //设置查询语句
-//	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
-//	m_ADOConn.m_pRecordset->Move(pos, vtMissing);
-//	m_dcontent = m_ADOConn.m_pRecordset->GetCollect("d_content");
-//	m_ADOConn.ExitConnect(); //断开数据库连接
-//	UpdateData(FALSE);
-//	//SetDlgItemText(IDC_COMBO1, strWeb);
-//}
-
-
 void CDairyDlg::AddtoGrid(CString date)
 {
 	m_dtitle.ResetContent();
@@ -291,6 +268,7 @@ void CDairyDlg::OnCbnSelchangeDtitle()
 	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
 	m_ADOConn.m_pRecordset->Move(pos, vtMissing);
 	m_dcontent = m_ADOConn.m_pRecordset->GetCollect("d_content");
+	m_current = m_ADOConn.m_pRecordset->GetCollect("d_title");
 	m_ADOConn.ExitConnect(); //断开数据库连接
 	UpdateData(FALSE);
 	//SetDlgItemText(IDC_COMBO1, strWeb);
