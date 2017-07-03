@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "afxcmn.h"
 
 #define   WM_SYSTEMTRAY WM_USER+5
 // CPersonalScheduleDlg 对话框
@@ -27,6 +28,7 @@ protected:
 	NOTIFYICONDATA NotifyIcon;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
+	void AddtoGrid();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	void InitButton();
 	CString Init_time;
@@ -51,4 +53,6 @@ public:
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedDairy();
 	afx_msg void OnBnClickedMemo();
+	CString m_maindetail;
+	CListCtrl m_schedule;
 };

@@ -61,6 +61,7 @@ END_MESSAGE_MAP()
 
 CPersonalScheduleDlg::CPersonalScheduleDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_PERSONALSCHEDULE_DIALOG, pParent)
+	, m_maindetail(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -68,6 +69,8 @@ CPersonalScheduleDlg::CPersonalScheduleDlg(CWnd* pParent /*=NULL*/)
 void CPersonalScheduleDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_MAINDETAIL, m_maindetail);
+	DDX_Control(pDX, IDC_MAINLIST, m_schedule);
 }
 
 BEGIN_MESSAGE_MAP(CPersonalScheduleDlg, CDialogEx)
@@ -154,6 +157,9 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 			menu->CheckMenuItem(ID_AUTOSTART, MF_CHECKED);
 		}
 	}
+	BOOL ifFind = finder.FindFile(_T("./flag.ini"));
+	if(!ifFind)
+		::WritePrivateProfileString(_T("Database Update Info"), _T("isUpdate"), _T("FALSE"), _T("./flag.ini"));
 	//系统托盘实现
 	NotifyIcon.cbSize = sizeof(NOTIFYICONDATA);
 	//NotifyIcon.hIcon=AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -164,6 +170,17 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	NotifyIcon.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	Shell_NotifyIcon(NIM_ADD, &NotifyIcon);   //添加系统托盘
 	
+	//list control 设定
+	CRect rect;
+	m_schedule.GetClientRect(&rect);
+	// 为列表视图控件添加全行选中和栅格风格   
+	m_schedule.SetExtendedStyle(m_schedule.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+
+	// 为列表视图控件添加三列   
+	m_schedule.InsertColumn(0, _T("日程时间"), LVCFMT_CENTER, rect.Width() / 3, 0);
+	m_schedule.InsertColumn(1, _T("日程标题"), LVCFMT_CENTER, rect.Width() / 3, 1);
+	m_schedule.InsertColumn(2, _T("日程内容"), LVCFMT_CENTER, rect.Width() / 3, 2);
+	AddtoGrid();
 	//定时器设定
 	OnTimer(0);
 	Init_time = InitTime();
@@ -171,6 +188,44 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	//AfxMessageBox(_T("111"));
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
+
+
+void CPersonalScheduleDlg::AddtoGrid()
+{
+	AdoAccess m_ADOConn;       // ADOConn类对象
+	m_ADOConn.OnInitADOConn(); //连接数据库
+	CString sql;
+	int i = 0;
+	sql.Format(_T("select * from datetable order by d_date asc"));                         //设置查询语句
+	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
+	while (!m_ADOConn.m_pRecordset->adoEOF)
+	{
+		//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
+		m_schedule.InsertItem(i, _T(""));
+		//向列表视图控件中插入列
+		m_schedule.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
+		m_schedule.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
+		m_schedule.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
+		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+		i++;
+	}
+	sql.Format(_T("select * from timetable order by t_time asc"));                         //设置查询语句
+	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
+	while (!m_ADOConn.m_pRecordset->adoEOF)
+	{
+		//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
+		m_schedule.InsertItem(i, _T(""));
+		//向列表视图控件中插入列
+		m_schedule.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("t_time")));
+		m_schedule.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("t_title")));
+		m_schedule.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("t_content")));
+		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+		i++;
+	}
+	m_ADOConn.ExitConnect(); //断开数据库连接
+}
+
+
 
 void CPersonalScheduleDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -302,8 +357,9 @@ void CPersonalScheduleDlg::SetAutoRun(BOOL bAutoRun)
 		if (RegOpenKeyEx(HKEY_CURRENT_USER, strRegPath, 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) //打开启动项       
 		{
 			TCHAR szModule[_MAX_PATH];
-			GetModuleFileName(NULL, szModule, _MAX_PATH);//得到本程序自身的全路径  
-			RegSetValueEx(hKey, _T("Client"), 0, REG_SZ, (const BYTE*)(LPCSTR)szModule, strlen((char*)szModule)); //添加一个子Key,并设置值，"Client"是应用程序名字（不加后缀.exe）  
+			GetModuleFileName(NULL, szModule, _MAX_PATH);//得到本程序自身的全路径
+			CString a = szModule;
+			RegSetValueEx(hKey, _T("PersonalSchedule"), 0, REG_SZ, (const BYTE*)(LPCSTR)szModule, a.GetLength()); //添加一个子Key,并设置值，"Client"是应用程序名字（不加后缀.exe）  
 			RegCloseKey(hKey); //关闭注册表  
 		}
 		else
@@ -315,7 +371,7 @@ void CPersonalScheduleDlg::SetAutoRun(BOOL bAutoRun)
 	{
 		if (RegOpenKeyEx(HKEY_CURRENT_USER, strRegPath, 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS)
 		{
-			RegDeleteValue(hKey, _T("Client"));
+			RegDeleteValue(hKey, _T("PersonalSchedule"));
 			RegCloseKey(hKey);
 		}
 	}

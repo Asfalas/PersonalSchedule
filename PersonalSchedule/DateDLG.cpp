@@ -29,7 +29,6 @@ BOOL CDateDLG::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	CRect rect;
-	// 获取编程语言列表视图控件的位置和大小   
 	m_jr_Grid.GetClientRect(&rect);
 	// 为列表视图控件添加全行选中和栅格风格   
 	m_jr_Grid.SetExtendedStyle(m_jr_Grid.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
@@ -39,7 +38,6 @@ BOOL CDateDLG::OnInitDialog()
 	m_jr_Grid.InsertColumn(1, _T("标题"), LVCFMT_CENTER, rect.Width() / 3, 1);
 	m_jr_Grid.InsertColumn(2, _T("内容"), LVCFMT_CENTER, rect.Width() / 3, 2);
 	AddtoGrid();
-	//m_ADOConn.ExitConnect(); //断开数据库连接
 	GetDlgItem(IDC_EDIT3)->EnableWindow(FALSE);
 	return TRUE;
 }
