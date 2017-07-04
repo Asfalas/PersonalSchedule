@@ -13,7 +13,7 @@ public:
 	CTimeDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CTimeDlg();
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG5 };
 #endif
@@ -32,10 +32,11 @@ public:
 	afx_msg void OnBnClickedTchange();
 	afx_msg void OnBnClickedTdel();
 	afx_msg void OnNMDblclkTlist(NMHDR *pNMHDR, LRESULT *pResult);
-//	CString m_hide;
+	//	CString m_hide;
 	CEdit m_hide;
 	afx_msg void OnEnKillfocusEditHide();
-//	CEdit m_tcontent;
+	//	CEdit m_tcontent;
 	CString m_tcontent;
 	afx_msg void OnNMKillfocusTlist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedTclear();
 };

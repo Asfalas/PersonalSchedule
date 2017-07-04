@@ -13,7 +13,7 @@ public:
 	CTimepopDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CTimepopDlg();
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_NEWTIME };
 #endif
@@ -24,10 +24,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	COleDateTime m_ttime;
-//	BOOL m_once;
-//	CButton m_perday;
-//	BOOL m_perday;
-//	BOOL m_perweek;
+	//	BOOL m_once;
+	//	CButton m_perday;
+	//	BOOL m_perday;
+	//	BOOL m_perweek;
 	int m_radio;
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedRadioOnce();

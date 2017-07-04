@@ -10,10 +10,10 @@ class CRemindDlg : public CDialogEx
 
 public:
 	CRemindDlg(CWnd* pParent = NULL);   // 标准构造函数
-	CRemindDlg(const CRemind& remind,CWnd* pParent = NULL);   // 标准构造函数
+	CRemindDlg(const CRemind& remind, CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CRemindDlg();
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_REMIND };
 #endif

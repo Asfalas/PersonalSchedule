@@ -9,7 +9,7 @@
 // CPersonalScheduleDlg 对话框
 class CPersonalScheduleDlg : public CDialogEx
 {
-// 构造
+	// 构造
 public:
 	CPersonalScheduleDlg(CWnd* pParent = NULL);	// 标准构造函数
 
@@ -18,7 +18,7 @@ public:
 	enum { IDD = IDD_PERSONALSCHEDULE_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
 
@@ -28,10 +28,11 @@ protected:
 	NOTIFYICONDATA NotifyIcon;
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
+	BOOL DateCmp(CString date);
 	void AddtoGrid();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	void InitButton();
-	CString Init_time,Init_date;
+	CString Init_time, Init_date;
 	CString  InitTime();
 	CString  InitDate();
 	int pos;

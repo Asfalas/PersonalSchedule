@@ -40,6 +40,7 @@ BEGIN_MESSAGE_MAP(CMemoDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_MDEL, &CMemoDlg::OnBnClickedMdel)
 	ON_NOTIFY(DTN_DATETIMECHANGE, IDC_MDATE, &CMemoDlg::OnDtnDatetimechangeMdate)
 	ON_CBN_SELCHANGE(IDC_MTITLE, &CMemoDlg::OnCbnSelchangeMtitle)
+	ON_BN_CLICKED(IDC_MCLEAR, &CMemoDlg::OnBnClickedMclear)
 END_MESSAGE_MAP()
 
 
@@ -269,5 +270,37 @@ void CMemoDlg::OnCbnSelchangeMtitle()
 	m_mcontent = m_ADOConn.m_pRecordset->GetCollect("m_content");
 	m_mcurrent = m_ADOConn.m_pRecordset->GetCollect("m_title");
 	m_ADOConn.ExitConnect(); //断开数据库连接
+	UpdateData(FALSE);
+}
+
+
+void CMemoDlg::OnBnClickedMclear()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	INT_PTR nRes;
+	// 显示消息对话框   
+	nRes = MessageBox(_T("您确定要进行清空所有备忘录吗？数据将无法恢复"), _T("消息提醒"), MB_OKCANCEL | MB_ICONQUESTION);
+	// 判断消息对话框返回值。如果为IDCANCEL就return，否则继续向下执行   
+	if (IDCANCEL == nRes)
+		return;
+	// TODO: 在此添加控件通知处理程序代码
+	m_mtitle.ResetContent();
+	AdoAccess m_ADOConn;       // ADOConn类对象
+	m_ADOConn.OnInitADOConn(); //连接数据库
+	_bstr_t sql;
+	sql = _T("select * from memotable");
+	m_ADOConn.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	m_ADOConn.m_pRecordset->Open(sql, m_ADOConn.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	while (!m_ADOConn.m_pRecordset->adoEOF)
+	{
+		m_ADOConn.m_pRecordset->Delete(adAffectCurrent);
+		m_ADOConn.m_pRecordset->Update();
+		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+	}
+	//m_dtitle.SetCurSel(0);
+	m_ADOConn.ExitConnect(); //断开数据库连接
+	AfxMessageBox(_T("清空成功"));
+	AddtoGrid(my_date);
 	UpdateData(FALSE);
 }

@@ -53,7 +53,7 @@ END_MESSAGE_MAP()
 void CTimepopDlg::OnBnClickedOk()
 {
 	UpdateData(TRUE);
-	if (m_ttitle == _T("")|| m_tcontent == _T(""))
+	if (m_ttitle == _T("") || m_tcontent == _T(""))
 	{
 		AfxMessageBox(_T("提醒内容不能为空"));
 		return;
@@ -78,21 +78,21 @@ void CTimepopDlg::OnBnClickedOk()
 	hourTime.Format(_T("%d"), hour);
 	minuteTime.Format(_T("%d"), minute);
 	secondTime.Format(_T("%d"), second);
-	CString timeFinal,m_type;
-	timeFinal.Format(_T("%s-%s-%s %s:%s:%s"), yearTime, mounthTime, dayTime,hourTime,minuteTime,secondTime);
+	CString timeFinal, m_type;
+	timeFinal.Format(_T("%s-%s-%s %s:%s:%s"), yearTime, mounthTime, dayTime, hourTime, minuteTime, secondTime);
 	switch (m_radio)
 	{
-		case 0:
-			m_type = _T("一次提醒");
-			break;
-		case 1:
-			m_type = _T("每天提醒");
-			break;
-		case 2: 
-			m_type = _T("每周提醒");
-			break;
-		default:
-			break;
+	case 0:
+		m_type = _T("一次提醒");
+		break;
+	case 1:
+		m_type = _T("每天提醒");
+		break;
+	case 2:
+		m_type = _T("每周提醒");
+		break;
+	default:
+		break;
 	}
 	AdoAccess database;
 	database.OnInitADOConn();

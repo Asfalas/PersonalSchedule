@@ -43,6 +43,7 @@ BEGIN_MESSAGE_MAP(CTimeDlg, CDialogEx)
 	ON_NOTIFY(NM_DBLCLK, IDC_TLIST, &CTimeDlg::OnNMDblclkTlist)
 	ON_EN_KILLFOCUS(IDC_EDIT_HIDE, &CTimeDlg::OnEnKillfocusEditHide)
 	ON_NOTIFY(NM_KILLFOCUS, IDC_TLIST, &CTimeDlg::OnNMKillfocusTlist)
+	ON_BN_CLICKED(IDC_TCLEAR, &CTimeDlg::OnBnClickedTclear)
 END_MESSAGE_MAP()
 
 
@@ -137,7 +138,7 @@ void CTimeDlg::OnNMClickTlist(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	GetDlgItem(IDC_TCHANGE)->EnableWindow(true);
 	GetDlgItem(IDC_TDEL)->EnableWindow(true);
-	m_tcontent = _T("提醒时间：") + m_tlist.GetItemText(nItem, 0) + "\r\n"  _T("提醒间隔：") + m_tlist.GetItemText(nItem, 2) + "\r\n" + _T("提醒标题：") + m_tlist.GetItemText(nItem, 1) + "\r\n" +  _T("提醒内容：") + m_tlist.GetItemText(nItem, 3);
+	m_tcontent = _T("提醒时间：") + m_tlist.GetItemText(nItem, 0) + "\r\n"  _T("提醒间隔：") + m_tlist.GetItemText(nItem, 2) + "\r\n" + _T("提醒标题：") + m_tlist.GetItemText(nItem, 1) + "\r\n" + _T("提醒内容：") + m_tlist.GetItemText(nItem, 3);
 	UpdateData(FALSE);
 	*pResult = 0;
 }
@@ -190,27 +191,27 @@ void CTimeDlg::OnNMDblclkTlist(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
-//	//AfxMessageBox(_T("111"));
-//	
-//	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
-//	CRect rc;
-//	
-//	m_Row = pNMListView->iItem;//获得选中的行  
-//	m_Col = pNMListView->iSubItem;//获得选中列  
-//	m_str = m_tlist.GetItemText(m_Row, m_Col);
-//	pos = m_tlist.GetSelectionMark();
-//
-////	if (pNMListView->iSubItem != 0) //如果选择的是子项;  
-////	{
-//	m_tlist.GetSubItemRect(m_Row, m_Col, LVIR_LABEL, rc);//获得子项的RECT；  
-//	m_hide.SetParent(&m_tlist);//转换坐标为列表框中的坐标  
-//	m_hide.MoveWindow(rc);//移动Edit到RECT坐在的位置;  
-//	m_hide.SetWindowText(m_tlist.GetItemText(m_Row, m_Col));//将该子项中的值放在Edit控件中；  
-//	m_hide.ShowWindow(SW_SHOW);//显示Edit控件；  
-//	m_hide.SetFocus();//设置Edit焦点  
-//	m_hide.ShowCaret();//显示光标  
-//	m_hide.SetSel(-1);//将光标移动到最后  
-////	}
+	//	//AfxMessageBox(_T("111"));
+	//	
+	//	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	//	CRect rc;
+	//	
+	//	m_Row = pNMListView->iItem;//获得选中的行  
+	//	m_Col = pNMListView->iSubItem;//获得选中列  
+	//	m_str = m_tlist.GetItemText(m_Row, m_Col);
+	//	pos = m_tlist.GetSelectionMark();
+	//
+	////	if (pNMListView->iSubItem != 0) //如果选择的是子项;  
+	////	{
+	//	m_tlist.GetSubItemRect(m_Row, m_Col, LVIR_LABEL, rc);//获得子项的RECT；  
+	//	m_hide.SetParent(&m_tlist);//转换坐标为列表框中的坐标  
+	//	m_hide.MoveWindow(rc);//移动Edit到RECT坐在的位置;  
+	//	m_hide.SetWindowText(m_tlist.GetItemText(m_Row, m_Col));//将该子项中的值放在Edit控件中；  
+	//	m_hide.ShowWindow(SW_SHOW);//显示Edit控件；  
+	//	m_hide.SetFocus();//设置Edit焦点  
+	//	m_hide.ShowCaret();//显示光标  
+	//	m_hide.SetSel(-1);//将光标移动到最后  
+	////	}
 	*pResult = 0;
 }
 
@@ -273,4 +274,33 @@ void CTimeDlg::OnNMKillfocusTlist(NMHDR *pNMHDR, LRESULT *pResult)
 	//GetDlgItem(IDC_TCHANGE)->EnableWindow(false);
 	//GetDlgItem(IDC_TDEL)->EnableWindow(false);
 	*pResult = 0;
+}
+
+
+void CTimeDlg::OnBnClickedTclear()
+{
+	INT_PTR nRes;
+	// 显示消息对话框   
+	nRes = MessageBox(_T("您确定要进行清空所有定时提醒吗？数据将无法恢复"), _T("消息提醒"), MB_OKCANCEL | MB_ICONQUESTION);
+	// 判断消息对话框返回值。如果为IDCANCEL就return，否则继续向下执行   
+	if (IDCANCEL == nRes)
+		return;
+	// TODO: 在此添加控件通知处理程序代码AdoAccess database;
+	AdoAccess database;
+	database.OnInitADOConn();
+	_bstr_t sql;
+	sql = "select * from datetable where d_type<>'定期提醒' order by d_date asc";
+	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	while (!database.m_pRecordset->adoEOF)
+	{
+		database.m_pRecordset->Delete(adAffectCurrent);
+		database.m_pRecordset->Update();
+		database.m_pRecordset->MoveNext();
+	}
+	database.ExitConnect();
+	AfxMessageBox(_T("清空成功"));
+	m_tlist.DeleteAllItems();
+	AddtoGrid();
 }

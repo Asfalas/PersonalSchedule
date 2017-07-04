@@ -27,6 +27,10 @@
 #define IDB_BITMAP7                     158
 #define IDB_BITMAP8                     159
 #define IDB_BITMAP9                     160
+#define IDB_BITMAP10                    161
+#define IDI_ICON1                       162
+#define IDB_BITMAP11                    164
+#define IDI_ICON2                       167
 #define IDC_BUTTON2                     1001
 #define IDC_BUTTON3                     1002
 #define IDC_BUTTON4                     1003
@@ -71,6 +75,7 @@
 #define IDC_TDEL                        1059
 #define IDC_EDIT_HIDE                   1060
 #define IDC_RADIO1                      1061
+#define IDC_TCLEAR                      1061
 #define IDC_RADIO2                      1062
 #define IDC_RADIO3                      1063
 #define IDC_CDATE                       1064
@@ -85,8 +90,10 @@
 #define IDC_MDEL                        1071
 #define IDC_DDATE                       1071
 #define IDC_DTITLE                      1072
+#define IDC_MCLEAR                      1072
 #define IDC_DCONTENT                    1073
 #define IDC_MDATE                       1074
+#define IDC_DCLEAR                      1074
 #define IDC_MCONTENT                    1075
 #define IDC_MAINDETAIL                  1076
 #define IDC_MAINLIST                    1077
@@ -120,9 +127,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        161
+#define _APS_NEXT_RESOURCE_VALUE        168
 #define _APS_NEXT_COMMAND_VALUE         32791
-#define _APS_NEXT_CONTROL_VALUE         1084
+#define _APS_NEXT_CONTROL_VALUE         1085
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

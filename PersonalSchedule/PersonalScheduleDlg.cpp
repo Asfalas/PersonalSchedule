@@ -34,12 +34,12 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 // 实现
@@ -67,7 +67,7 @@ CPersonalScheduleDlg::CPersonalScheduleDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_PERSONALSCHEDULE_DIALOG, pParent)
 	, m_maindetail(_T(""))
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON2);
 }
 
 void CPersonalScheduleDlg::DoDataExchange(CDataExchange* pDX)
@@ -144,7 +144,6 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	// TODO: 在此添加额外的初始化代码
 	//按钮初始化
 	InitButton();
-
 	//开机自启动文件初始化
 	CFileFind finder;   //查找是否存在ini文件，若不存在，则生成一个新的默认设置的ini文件，这样就保证了我们更改后的设置每次都可用
 	BOOL ifFind = finder.FindFile(thisPath + _T("autorun.ini"));
@@ -163,7 +162,7 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 			CMenu* menu = GetMenu()->GetSubMenu(0);
 			menu->CheckMenuItem(ID_AUTOSTART, MF_UNCHECKED);
 		}
-		else 
+		else
 		{
 			CMenu* menu = GetMenu()->GetSubMenu(0);
 			menu->CheckMenuItem(ID_AUTOSTART, MF_CHECKED);
@@ -178,7 +177,7 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	NotifyIcon.uCallbackMessage = WM_SYSTEMTRAY;
 	NotifyIcon.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	Shell_NotifyIcon(NIM_ADD, &NotifyIcon);   //添加系统托盘
-	
+
 	//list control 设定
 	CRect rect;
 	m_schedule.GetClientRect(&rect);
@@ -198,12 +197,44 @@ BOOL CPersonalScheduleDlg::OnInitDialog()
 	SetTimer(1, 1000, NULL);
 	SetTimer(2, 1000, NULL);
 	SetTimer(3, 60000, NULL);
+
+	GetDlgItem(IDC_MAINDETAIL)->EnableWindow(0);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
+BOOL CPersonalScheduleDlg::DateCmp(CString date) 
+{
+	int thisyear, thismonth, thisday,year,month,day;
+	CString yeartime, monthtime, daytime;
+	yeartime = date.Left(4);
+	date = date.Mid(date.Find(_T("/"))+1);
+	monthtime = date.Left(date.Find(_T("/")));
+	daytime = date.Right(date.GetLength() - monthtime.GetLength()-1);
+	year = _ttoi(yeartime);
+	month = _ttoi(monthtime);
+	day = _ttoi(daytime);
+	COleDateTime thisdate;
+	thisdate = COleDateTime::GetCurrentTime();
+	thisyear = thisdate.GetYear();
+	thismonth = thisdate.GetMonth();
+	thisday = thisdate.GetDay();
+	if (thisyear >= year&&thismonth >= month&&thisday >= day)
+		return true;
+	return false;
+}
 
 void CPersonalScheduleDlg::AddtoGrid()
 {
+	m_schedule.DeleteAllItems();
+
+	COleDateTime s_time;
+	s_time = COleDateTime::GetCurrentTime();
+	int sys_weekday = s_time.GetDayOfWeek();
+
+	//AfxMessageBox(_T("test"));
+	AdoAccess data;				 // ADOConn类对象
+	data.OnInitADOConn();		 //连接数据库
+	CString time, title, content, isRemind, type,weekday;
 	AdoAccess m_ADOConn;       // ADOConn类对象
 	m_ADOConn.OnInitADOConn(); //连接数据库
 	CString sql;
@@ -213,14 +244,50 @@ void CPersonalScheduleDlg::AddtoGrid()
 	while (!m_ADOConn.m_pRecordset->adoEOF)
 	{
 		CString isremind = m_ADOConn.m_pRecordset->GetCollect("d_remind");
-		if (isremind == "FALSE")
+		CString type = m_ADOConn.m_pRecordset->GetCollect("d_type");
+		CString weekday = m_ADOConn.m_pRecordset->GetCollect("d_weekday");
+		time = m_ADOConn.m_pRecordset->GetCollect("d_date");
+		
+		if(type=="定期提醒"&&isremind == "FALSE")
 		{//向列表视图控件中插入行IDC_STATIC_ZZH_CONTENTIDC_STATIC_ZZH_TITLE
+			if (DateCmp(time))
+			{
+				m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+				continue;
+			}
 			m_schedule.InsertItem(i, _T(""));
 			//向列表视图控件中插入列
 			m_schedule.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
 			m_schedule.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
 			m_schedule.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
 			i++;
+		}
+		else if (isremind == _T("FALSE"))
+		{
+			if (type == "一次提醒")
+			{
+				CString date = InitDate();
+				if (date == time.Left(time.Find(_T(" "))))
+				{
+					m_schedule.InsertItem(i, _T(""));
+					//向列表视图控件中插入列
+					m_schedule.SetItemText(i, 0, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_date")));
+					m_schedule.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
+					m_schedule.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
+					i++;
+				}
+			}
+			if (type == "每天提醒" || (type == "每周提醒"&&sys_weekday == weekday))
+			{
+				CString thisdate = InitDate();
+				m_schedule.InsertItem(i, _T(""));
+				thisdate = thisdate + _T(" ") + time.Mid(time.Find(_T(" "))+1);
+				//向列表视图控件中插入列
+				m_schedule.SetItemText(i, 0, thisdate);
+				m_schedule.SetItemText(i, 1, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")));
+				m_schedule.SetItemText(i, 2, (LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_content")));
+				i++;
+			}
 		}
 		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
 	}
@@ -242,38 +309,38 @@ void CPersonalScheduleDlg::OnSysCommand(UINT nID, LPARAM lParam)
 }
 
 
-void CPersonalScheduleDlg::InitButton() 
+void CPersonalScheduleDlg::InitButton()
 {
 	//按钮初始化
 	HBITMAP   hBitmap[8];
 	hBitmap[0] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP2));
 	((CWnd *)GetDlgItem(IDC_BUTTON2))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON2))->SetBitmap(hBitmap[0]);
-	
+
 	hBitmap[1] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP1));
 	((CWnd *)GetDlgItem(IDC_BUTTON3))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON3))->SetBitmap(hBitmap[1]);
-	
+
 	hBitmap[2] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP3));
 	((CWnd *)GetDlgItem(IDC_BUTTON4))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON4))->SetBitmap(hBitmap[2]);
-	
+
 	hBitmap[3] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP4));
 	((CWnd *)GetDlgItem(IDC_BUTTON5))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON5))->SetBitmap(hBitmap[3]);
-	
+
 	hBitmap[4] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP5));
 	((CWnd *)GetDlgItem(IDC_BUTTON6))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON6))->SetBitmap(hBitmap[4]);
-	
+
 	hBitmap[5] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP8));
 	((CWnd *)GetDlgItem(IDC_BUTTON_HELP))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON_HELP))->SetBitmap(hBitmap[5]);
-	
+
 	hBitmap[6] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP7));
 	((CWnd *)GetDlgItem(IDC_BUTTON_EXIT))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON_EXIT))->SetBitmap(hBitmap[6]);
-	
+
 	hBitmap[7] = LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP9));
 	((CWnd *)GetDlgItem(IDC_BUTTON_HOLIDAY))->SetWindowPos(NULL, 0, 0, 65, 65, SWP_NOZORDER | SWP_NOMOVE);
 	((CButton *)GetDlgItem(IDC_BUTTON_HOLIDAY))->SetBitmap(hBitmap[7]);
@@ -291,15 +358,9 @@ CString CPersonalScheduleDlg::InitTime()
 	CString hourTime;
 	CString minuteTime;
 	CString secondTime;
-	if(hour>9)
-		hourTime.Format(_T("%d"), hour);
-	else hourTime.Format(_T("0%d"), hour);
-	if (minute>9)
-		minuteTime.Format(_T("%d"), minute);
-	else minuteTime.Format(_T("0%d"), minute);
-	if (second>9)
-		secondTime.Format(_T("%d"), second);
-	else secondTime.Format(_T("0%d"), second);
+	hourTime.Format(_T("%d"), hour);
+	minuteTime.Format(_T("%d"), minute);
+	secondTime.Format(_T("%d"), second);
 	sys_timeFinal.Format(_T("%s:%s:%s"), hourTime, minuteTime, secondTime);
 	return sys_timeFinal;
 }
@@ -427,14 +488,14 @@ void CPersonalScheduleDlg::OnAutostart()
 {
 	CString isAutorun;
 	GetPrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T(""), isAutorun.GetBuffer(MAX_PATH), MAX_PATH, thisPath + _T("autorun.ini"));
-	if (isAutorun == "FALSE") 
+	if (isAutorun == "FALSE")
 	{
 		SetAutoRun(TRUE);
 		CMenu* menu = GetMenu()->GetSubMenu(0);
 		menu->CheckMenuItem(ID_AUTOSTART, MF_CHECKED);
 		::WritePrivateProfileString(_T("Autorun Info"), _T("isAutoRun"), _T("TRUE"), thisPath + _T("autorun.ini"));
 	}
-	else 
+	else
 	{
 		SetAutoRun(FALSE);
 		CMenu* menu = GetMenu()->GetSubMenu(0);
@@ -462,8 +523,10 @@ void CPersonalScheduleDlg::OnBnClickedButton2()
 	nRes = tipDlg.DoModal();  // 弹出对话框 
 	OnTimer(0);
 	SetTimer(0, 6000, NULL);
+	AddtoGrid();
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
+	
 }
 
 
@@ -524,6 +587,7 @@ void CPersonalScheduleDlg::OnMinimize()
 }
 
 
+
 void CPersonalScheduleDlg::OnMinShow()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -553,8 +617,10 @@ void CPersonalScheduleDlg::OnHoliday()
 	nRes = hDlg.DoModal();  // 弹出对话框
 	OnTimer(3);
 	SetTimer(3, 6000, NULL);
+	AddtoGrid();
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
+	
 }
 
 
@@ -580,6 +646,7 @@ void CPersonalScheduleDlg::OnBnClickedButton3()
 	SetTimer(1, 1000, NULL);
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
+	AddtoGrid();
 }
 
 
@@ -591,6 +658,7 @@ void CPersonalScheduleDlg::OnBnClickedDairy()
 	nRes = dDlg.DoModal();  // 弹出对话框   
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
+	AddtoGrid();
 }
 
 
@@ -602,10 +670,11 @@ void CPersonalScheduleDlg::OnBnClickedMemo()
 	nRes = mDlg.DoModal();  // 弹出对话框   
 	if (IDCANCEL == nRes)     // 判断对话框退出后返回值是否为IDCANCEL，如果是则return，否则继续向下执行   
 		return;
+	AddtoGrid();
 }
 
 
-void CPersonalScheduleDlg::CheckDate() 
+void CPersonalScheduleDlg::CheckDate()
 {
 	CString sys_dateFinal, path, name, vol;
 	sys_dateFinal = InitDate();
@@ -634,7 +703,7 @@ void CPersonalScheduleDlg::CheckDate()
 			}
 			KillTimer(0);
 			//MessageBox(_T("你今天的日程为:\r\n标题：" + title + "\r\n内容：" + content), _T("日程提醒"), MB_ICONQUESTION);
-			CRemind remind(title, content, date+" "+InitTime());
+			CRemind remind(title, content, date + " " + InitTime());
 			CRemindDlg rDlg(remind);
 			rDlg.DoModal();
 			data.m_pRecordset->PutCollect("d_remind", (_bstr_t)"TRUE");
@@ -645,6 +714,7 @@ void CPersonalScheduleDlg::CheckDate()
 	}
 	stop(myDevice);
 	data.ExitConnect(); //断开数据库连接
+
 }
 
 
@@ -668,7 +738,7 @@ void CPersonalScheduleDlg::CheckHoliday()
 		title = data.m_pRecordset->GetCollect("h_title");
 		content = data.m_pRecordset->GetCollect("h_content");
 		isRemind = data.m_pRecordset->GetCollect("h_remind");
-		if (sys_dateFinal.Right(sys_dateFinal.GetLength() - sys_dateFinal.Find(_T("/")) - 1) == date.Right(date.GetLength() - date.Find(_T("/")) - 1) &&isRemind == _T("FALSE"))
+		if (sys_dateFinal.Right(sys_dateFinal.GetLength() - sys_dateFinal.Find(_T("/")) - 1) == date.Right(date.GetLength() - date.Find(_T("/")) - 1) && isRemind == _T("FALSE"))
 		{
 			if (!flag)
 			{
@@ -701,7 +771,7 @@ void CPersonalScheduleDlg::CheckTime()
 	//AfxMessageBox(_T("test"));
 	AdoAccess data;				 // ADOConn类对象
 	data.OnInitADOConn();		 //连接数据库
-	CString time, title, content, isRemind,type;
+	CString time, title, content, isRemind, type;
 	int weekday;
 	_bstr_t sql;
 	sql = "select * from datetable where d_type<>'定期提醒'";                         //设置查询语句
@@ -718,8 +788,8 @@ void CPersonalScheduleDlg::CheckTime()
 		isRemind = data.m_pRecordset->GetCollect("d_remind");
 		weekday = data.m_pRecordset->GetCollect("d_weekday");
 		type = data.m_pRecordset->GetCollect("d_type");
-		if (time.Mid(time.Find(_T(" ")) + 1) == sys_timeFinal&&isRemind == _T("FALSE"))
-		{ 
+		if (time.Mid(time.Find(_T(" "))+1) == sys_timeFinal&&isRemind == _T("FALSE"))
+		{
 			if (type == "一次提醒")
 			{
 				CString date = InitDate();

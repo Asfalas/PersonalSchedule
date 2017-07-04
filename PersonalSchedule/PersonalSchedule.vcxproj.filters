@@ -161,5 +161,14 @@
     <Image Include="res\power.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\Sicun.Studio_logo.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\work_schedule_128px_1208240_easyicon.net.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

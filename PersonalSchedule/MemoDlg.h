@@ -14,7 +14,7 @@ public:
 	virtual ~CMemoDlg();
 	int pos;
 	CString my_date;
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_MEMO };
 #endif
@@ -40,4 +40,5 @@ public:
 	afx_msg void OnBnClickedMdel();
 	afx_msg void OnDtnDatetimechangeMdate(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnCbnSelchangeMtitle();
+	afx_msg void OnBnClickedMclear();
 };

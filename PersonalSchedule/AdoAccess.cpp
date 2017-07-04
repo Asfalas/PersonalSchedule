@@ -6,12 +6,12 @@ void AdoAccess::OnInitADOConn()
 {
 	::CoInitialize(NULL);
 	try {
-		m_pConnection.CreateInstance("ADODB.Connection");			
+		m_pConnection.CreateInstance("ADODB.Connection");
 		TCHAR szModule[_MAX_PATH];
 		GetModuleFileName(NULL, szModule, _MAX_PATH);//得到本程序自身的全路径
 		CString thisModule = szModule;
 		thisModule = thisModule.Left(thisModule.GetLength() - 20);
-		_bstr_t strConnect = _T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source="+ thisModule +"PSchedule.mdb");
+		_bstr_t strConnect = _T("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + thisModule + "PSchedule.mdb");
 		m_pConnection->Open(strConnect, _T(""), _T(""), adModeUnknown);
 		//AfxMessageBox(_T("连接成功"));
 	}

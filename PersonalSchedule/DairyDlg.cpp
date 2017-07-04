@@ -34,12 +34,13 @@ void CDairyDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CDairyDlg, CDialogEx) 
+BEGIN_MESSAGE_MAP(CDairyDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_DADD, &CDairyDlg::OnBnClickedDadd)
 	ON_BN_CLICKED(IDC_DCHANGE, &CDairyDlg::OnBnClickedDchange)
 	ON_BN_CLICKED(IDC_DDEL, &CDairyDlg::OnBnClickedDdel)
 	ON_NOTIFY(DTN_DATETIMECHANGE, IDC_DDATE, &CDairyDlg::OnDtnDatetimechangeDdate)
 	ON_CBN_SELCHANGE(IDC_DTITLE, &CDairyDlg::OnCbnSelchangeDtitle)
+	ON_BN_CLICKED(IDC_DCLEAR, &CDairyDlg::OnBnClickedDclear)
 END_MESSAGE_MAP()
 
 
@@ -60,7 +61,7 @@ void CDairyDlg::AddtoGrid(CString date)
 	AdoAccess m_ADOConn;       // ADOConn类对象
 	m_ADOConn.OnInitADOConn(); //连接数据库
 	CString sql;
-	sql.Format(_T("select * from dairytable where d_date='"+date+"'"));                         //设置查询语句
+	sql.Format(_T("select * from dairytable where d_date='" + date + "'"));                         //设置查询语句
 	m_ADOConn.m_pRecordset = m_ADOConn.GetRecordSet((_bstr_t)sql); //查询
 	if (!m_ADOConn.m_pRecordset->adoEOF)
 	{
@@ -103,7 +104,7 @@ CString CDairyDlg::InitTime()
 }
 
 
-BOOL CDairyDlg::CheckTitle(CString title,int place) 
+BOOL CDairyDlg::CheckTitle(CString title, int place)
 {
 	AdoAccess m_ADOConn;       // ADOConn类对象
 	m_ADOConn.OnInitADOConn(); //连接数据库
@@ -117,7 +118,7 @@ BOOL CDairyDlg::CheckTitle(CString title,int place)
 			m_ADOConn.m_pRecordset->MoveNext();
 			continue;
 		}
-		if (title == ((LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title")))||title.IsEmpty())
+		if (title == ((LPCTSTR)_bstr_t(m_ADOConn.m_pRecordset->GetCollect("d_title"))) || title.IsEmpty())
 		{
 			m_ADOConn.ExitConnect(); //断开数据库连接
 			return false;
@@ -132,7 +133,7 @@ BOOL CDairyDlg::CheckTitle(CString title,int place)
 void CDairyDlg::OnBnClickedDadd()
 {
 	UpdateData(TRUE);
-	if (!CheckTitle(m_current,-1))
+	if (!CheckTitle(m_current, -1))
 	{
 		AfxMessageBox(_T("该日该标题已被添加或标题内容为空"));
 		AddtoGrid(my_date);
@@ -179,7 +180,7 @@ void CDairyDlg::OnBnClickedDchange()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = _T("select * from dairytable where d_date = '"+my_date+"'");
+	sql = _T("select * from dairytable where d_date = '" + my_date + "'");
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);
@@ -272,4 +273,35 @@ void CDairyDlg::OnCbnSelchangeDtitle()
 	m_ADOConn.ExitConnect(); //断开数据库连接
 	UpdateData(FALSE);
 	//SetDlgItemText(IDC_COMBO1, strWeb);
+}
+
+
+void CDairyDlg::OnBnClickedDclear()
+{
+	INT_PTR nRes;
+	// 显示消息对话框   
+	nRes = MessageBox(_T("您确定要进行清空所有日记吗？数据将无法恢复"), _T("消息提醒"), MB_OKCANCEL | MB_ICONQUESTION);
+	// 判断消息对话框返回值。如果为IDCANCEL就return，否则继续向下执行   
+	if (IDCANCEL == nRes)
+		return;
+	// TODO: 在此添加控件通知处理程序代码
+	m_dtitle.ResetContent();
+	AdoAccess m_ADOConn;       // ADOConn类对象
+	m_ADOConn.OnInitADOConn(); //连接数据库
+	_bstr_t sql;
+	sql = _T("select * from dairytable");
+	m_ADOConn.m_pRecordset.CreateInstance(__uuidof(Recordset));
+	m_ADOConn.m_pRecordset->Open(sql, m_ADOConn.m_pConnection.GetInterfacePtr(), adOpenDynamic,
+		adLockOptimistic, adCmdText);
+	while (!m_ADOConn.m_pRecordset->adoEOF)
+	{
+		m_ADOConn.m_pRecordset->Delete(adAffectCurrent);
+		m_ADOConn.m_pRecordset->Update();
+		m_ADOConn.m_pRecordset->MoveNext(); //将记录集指针移动到下一条记录
+	}
+	//m_dtitle.SetCurSel(0);
+	m_ADOConn.ExitConnect(); //断开数据库连接
+	AfxMessageBox(_T("清空成功"));
+	AddtoGrid(my_date);
+	UpdateData(FALSE);
 }

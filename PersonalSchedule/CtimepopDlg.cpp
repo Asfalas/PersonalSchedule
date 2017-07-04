@@ -29,7 +29,7 @@ CCtimepopDlg::CCtimepopDlg(int pos, CWnd * pParent)
 	, m_radio1(0)
 	, m_ctitle(_T(""))
 	, m_ccontent(_T(""))
-	,pos(pos)
+	, pos(pos)
 {
 }
 
@@ -76,7 +76,7 @@ BOOL CCtimepopDlg::OnInitDialog()
 	try
 	{
 		database.m_pRecordset->Move(pos, vtMissing);
-		m_ctitle=database.m_pRecordset->GetCollect("d_title");
+		m_ctitle = database.m_pRecordset->GetCollect("d_title");
 		m_ccontent = database.m_pRecordset->GetCollect("d_content");
 		database.ExitConnect();
 	}

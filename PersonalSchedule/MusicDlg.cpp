@@ -44,9 +44,9 @@ BEGIN_MESSAGE_MAP(CMusicDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_play, &CMusicDlg::OnBnClickedplay)
 	ON_BN_CLICKED(IDC_pause, &CMusicDlg::OnBnClickedpause)
 	ON_BN_CLICKED(IDC_stop, &CMusicDlg::OnBnClickedstop)
-//	ON_NOTIFY(NM_THEMECHANGED, IDC_SCROLLBAR1, &CMusicDlg::OnThemechangedScrollbar1)
-ON_WM_HSCROLL()
-ON_BN_CLICKED(IDOK, &CMusicDlg::OnBnClickedOk)
+	//	ON_NOTIFY(NM_THEMECHANGED, IDC_SCROLLBAR1, &CMusicDlg::OnThemechangedScrollbar1)
+	ON_WM_HSCROLL()
+	ON_BN_CLICKED(IDOK, &CMusicDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 BOOL CMusicDlg::OnInitDialog()
@@ -88,7 +88,7 @@ BOOL CMusicDlg::InitMusic() {
 		GetPrivateProfileString(_T("Music Info"), _T("m_path"), _T(""), m_path.GetBuffer(MAX_PATH), MAX_PATH, thisPath1 + _T("music.ini"));
 		GetPrivateProfileString(_T("Music Info"), _T("m_name"), _T(""), m_name.GetBuffer(MAX_PATH), MAX_PATH, thisPath1 + _T("music.ini"));
 		GetPrivateProfileString(_T("Music Info"), _T("m_vol"), _T(""), m_vol.GetBuffer(MAX_PATH), MAX_PATH, thisPath1 + _T("music.ini"));
-		if ((m_path=="")|| (m_name == "") || (m_vol == ""))
+		if ((m_path == "") || (m_name == "") || (m_vol == ""))
 			return false;
 	}
 	SetDlgItemText(IDC_filename, m_path);
@@ -106,7 +106,7 @@ void Load(HWND hWnd, CString strFilepath)
 	if (dwReturn = mciSendCommand(NULL, MCI_OPEN, MCI_OPEN_ELEMENT | MCI_WAIT, (DWORD)(LPVOID)&mciopenparms))
 	{
 		//如果打开玩家失败,将出错信息储存在buffer,并显示出错警告  
-		char buffer[256] = {0};
+		char buffer[256] = { 0 };
 		mciGetErrorString(dwReturn, (LPWSTR)buffer, 256); //获取错误码对应的错误信息  
 		MessageBox(hWnd, (LPWSTR)buffer, _T("出错警告！"), MB_ICONHAND | MB_ICONERROR | MB_ICONSTOP); //弹出错误信息提示对话框  
 	}
@@ -125,7 +125,7 @@ void CMusicDlg::play()
 	MCI_DGV_SETAUDIO_PARMS setvolume; //设置音量的参数结构体  
 	setvolume.dwCallback = NULL; //  
 	setvolume.dwItem = MCI_DGV_SETAUDIO_VOLUME; //动作是设置音量  
-	setvolume.dwValue = _ttoi(m_vol)*10; //音量值是vol  
+	setvolume.dwValue = _ttoi(m_vol) * 10; //音量值是vol  
 	mciSendCommand(DeviceId, MCI_SETAUDIO, MCI_DGV_SETAUDIO_ITEM | MCI_DGV_SETAUDIO_VALUE, (DWORD)(LPVOID)&setvolume);
 }
 
@@ -151,14 +151,14 @@ DWORD setvolume(DWORD vol)
 	MCI_DGV_SETAUDIO_PARMS setvolume; //设置音量的参数
 	setvolume.dwCallback = NULL; //
 	setvolume.dwItem = MCI_DGV_SETAUDIO_VOLUME; //动作是设置音量
-	setvolume.dwValue = vol*10; //音量值是vol
+	setvolume.dwValue = vol * 10; //音量值是vol
 	mciSendCommand(DeviceId, MCI_SETAUDIO, MCI_DGV_SETAUDIO_ITEM | MCI_DGV_SETAUDIO_VALUE, (DWORD)(LPVOID)&setvolume);
 	return 0;
 }
- 
+
 void CMusicDlg::OnBnClickedfilechoice()
 {
-	CString szFileFilter =_T("mp3文件(*.mp3)|*.mp3|"
+	CString szFileFilter = _T("mp3文件(*.mp3)|*.mp3|"
 		"wma文件(*.wma)|*.wma|"
 		"wav文件(*.wav)|*.wav|"
 		"所有文件(*.*)|*.*|");
@@ -270,10 +270,10 @@ void CMusicDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		break;
 		// 下面的m_horiScrollbar.SetScrollPos(pos);执行时会第二次进入此函数，最终确定滚动块位置，并且会直接到default分支，所以在此处设置编辑框中显示数值  
 	default:
-		setvolume(pos); 
+		setvolume(pos);
 		CString p;
 		p.Format(_T("%d"), pos);
-		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"),p, thisPath1 + _T("music.ini"));
+		::WritePrivateProfileString(_T("Music Info"), _T("m_vol"), p, thisPath1 + _T("music.ini"));
 		SetDlgItemInt(IDC_vol, pos);
 		return;
 	}

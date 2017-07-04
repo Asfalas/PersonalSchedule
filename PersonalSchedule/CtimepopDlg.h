@@ -13,7 +13,7 @@ public:
 	CCtimepopDlg(int pos, CWnd* pParent = NULL);
 	virtual ~CCtimepopDlg();
 	int pos;
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_CTIME };
 #endif
@@ -23,10 +23,6 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-//	COleDateTime m_cdate;
-//	COleDateTime m_ctime;
-//	CString m_ctitle;
-//	CString m_ccontent;
 	COleDateTime m_cdate;
 	COleDateTime m_ctime;
 	int m_radio1;

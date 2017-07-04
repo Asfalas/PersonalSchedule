@@ -135,7 +135,7 @@ void CFestivalDlg::OnBnClickedHnew()
 		AfxMessageBox(str);
 		return;
 	}
-	
+
 	MessageBox(_T("添加成功"));
 	m_hlist.DeleteAllItems();
 	AddtoGrid();
@@ -290,6 +290,12 @@ void CFestivalDlg::OnBnClickedHchange()
 
 void CFestivalDlg::OnBnClickedHclear()
 {
+	INT_PTR nRes;
+	// 显示消息对话框   
+	nRes = MessageBox(_T("您确定要进行清空吗？数据将无法恢复"), _T("消息提醒"), MB_OKCANCEL | MB_ICONQUESTION);
+	// 判断消息对话框返回值。如果为IDCANCEL就return，否则继续向下执行   
+	if (IDCANCEL == nRes)
+		return;
 	// TODO: 在此添加控件通知处理程序代码
 	AdoAccess database;
 	database.OnInitADOConn();

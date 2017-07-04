@@ -86,9 +86,9 @@ void CRemindDlg::OnCbnSelchangeLater()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString strWeb;
-	int nSel;   
+	int nSel;
 	nSel = m_later.GetCurSel();
-	AfxMessageBox(m_rtime);
+	//AfxMessageBox(m_rtime);
 	m_rtime = CalTime(m_rtime, nSel);
 	//AfxMessageBox(m_rtime);
 	AdoAccess database;       // ADOConn类对象
@@ -116,34 +116,35 @@ void CRemindDlg::OnCbnSelchangeLater()
 }
 
 
-CString CRemindDlg::CalTime(CString time,int sel) 
+CString CRemindDlg::CalTime(CString time, int sel)
 {
 	int hour, minute, second;
-	CString hourtime, minutetime, secondtime,date,timefinal;
+	CString hourtime, minutetime, secondtime, date, timefinal;
 	date = time.Left(time.Find(_T(" ")));
-	time = time.Right(time.GetLength()- m_rtime.Find(_T(" "))-1);
+	time = time.Right(time.GetLength() - m_rtime.Find(_T(" ")) - 1);
 	hourtime = time.Left(time.Find(_T(":")));
-	time = time.Right(time.GetLength() - hourtime.GetLength()-1);
+	time = time.Right(time.GetLength() - hourtime.GetLength() - 1);
 	minutetime = time.Left(time.Find(_T(":")));
-	secondtime = time.Right(time.GetLength()- minutetime.GetLength()-1);
+	secondtime = time.Right(time.GetLength() - minutetime.GetLength() - 1);
 	hour = _ttoi(hourtime);
 	minute = _ttoi(minutetime);
-	switch (sel) 
+	second = _ttoi(secondtime);
+	switch (sel)
 	{
 	case 0:
 		if (minute + 1 > 60)
-			hour=(++hour)%24;
+			hour = (++hour) % 24;
 		minute = (++minute) % 60;
 		break;
 	case 1:
 		if (minute + 15 > 60)
 			hour = (++hour) % 24;
-		minute = (minute+15) % 60;
+		minute = (minute + 15) % 60;
 		break;
 	case 2:
 		if (minute + 30 > 60)
 			hour = (++hour) % 24;
-		minute = (minute+30) % 60;
+		minute = (minute + 30) % 60;
 		break;
 	case 3:
 		hour += 1;
@@ -151,14 +152,9 @@ CString CRemindDlg::CalTime(CString time,int sel)
 	default:
 		break;
 	}
-	if (hour > 9)
-		hourtime.Format(_T("%d"), hour);
-	else
-		hourtime.Format(_T("0%d", hour));
-	if (minute > 9)
-		minutetime.Format(_T("%d"), minute);
-	else
-		minutetime.Format(_T("0%d", minute));
+	hourtime.Format(_T("%d"), hour);
+	hourtime.Format(_T("%d"),hour);
+	minutetime.Format(_T("%d"), minute);
 	timefinal = date + " " + hourtime + ":" + minutetime + ":" + secondtime;
 	return timefinal;
 }
@@ -169,8 +165,7 @@ void CRemindDlg::OnBnClickedOk()
 	AdoAccess database;
 	database.OnInitADOConn();
 	_bstr_t sql;
-	sql = "select * from latertable where l_time='" + (_bstr_t)m_rtime+ "'";
-	AfxMessageBox(sql);
+	sql = "select * from latertable where l_time='" + (_bstr_t)m_rtime + "'";
 	database.m_pRecordset.CreateInstance(__uuidof(Recordset));
 	database.m_pRecordset->Open(sql, database.m_pConnection.GetInterfacePtr(), adOpenDynamic,
 		adLockOptimistic, adCmdText);

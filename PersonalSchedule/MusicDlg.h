@@ -12,7 +12,7 @@ public:
 	CMusicDlg(CWnd* pParent = NULL);   // 标准构造函数
 	virtual ~CMusicDlg();
 
-// 对话框数据
+	// 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_DIALOG2 };
 #endif
@@ -35,7 +35,7 @@ public:
 	BOOL InitMusic();
 	CScrollBar m_slider;
 	int m_int;
-//	afx_msg void OnThemechangedScrollbar1(NMHDR *pNMHDR, LRESULT *pResult);
+	//	afx_msg void OnThemechangedScrollbar1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedOk();

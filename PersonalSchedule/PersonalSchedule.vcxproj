@@ -239,11 +239,14 @@
     <Image Include="res\calendar.bmp" />
     <Image Include="res\error.bmp" />
     <Image Include="res\hold.bmp" />
+    <Image Include="res\icon1.ico" />
     <Image Include="res\music-player-2.bmp" />
     <Image Include="res\notebook-1.bmp" />
     <Image Include="res\notepad-1.bmp" />
     <Image Include="res\PersonalSchedule.ico" />
     <Image Include="res\power.bmp" />
+    <Image Include="res\Sicun.Studio_logo.ico" />
+    <Image Include="res\work_schedule_128px_1208240_easyicon.net.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
